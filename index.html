@@ -2,1630 +2,400 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OT Records</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker - Cloud</title>
     <style>
+        /* Telegram Inspired Minimalist UI */
         :root {
-            /* Telegram Inspired Color Palette */
-            --primary-blue: #3390ec;
-            --light-blue: #64b5ef;
-            --app-bg: #f3f2f8; 
-            --header-bg: #ffffff;
-            --card-bg: #ffffff;
-            --text-main: #000000;
-            --text-muted: #8e8e93;
-            --input-bg: #f4f4f5;
-            --border-color: #e5e5ea;
-            --success-green: #34c759;
-            --danger-red: #ff3b30;
-            --warning-yellow: #ffcc00;
+            --tg-blue: #3390ec; --tg-bg: #f4f4f5; --tg-white: #ffffff;
+            --tg-text: #000000; --tg-gray: #8e8e93; --tg-red: #e53935;
+            --tg-green: #4caf50; --tg-border: #e0e0e0;
         }
 
-        body.dark-mode {
-            --app-bg: #000000;
-            --header-bg: #1c1c1d;
-            --card-bg: #1c1c1d;
-            --text-main: #ffffff;
-            --text-muted: #8e8e93;
-            --input-bg: #2c2c2e;
-            --border-color: #38383a;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--tg-bg); color: var(--tg-text); display: flex; justify-content: center; }
+
+        .app-container { width: 100%; max-width: 480px; background-color: var(--tg-bg); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+
+        /* ================= LOGIN SCREEN ================= */
+        #loginScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100vh;
+            background-color: var(--tg-white); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 200; padding: 20px;
+            text-align: center;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--app-bg); color: var(--text-main); padding-bottom: 90px; transition: background-color 0.3s ease; overflow-x: hidden; }
+        .login-logo {
+            width: 80px; height: 80px; background: var(--tg-blue); border-radius: 20px;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 20px;
+            color: white; font-size: 32px; font-weight: bold;
+        }
 
-        /* Telegram-style Header */
-        .sticky-header-container { position: sticky; top: 0; z-index: 1000; width: 100%; background-color: var(--header-bg); border-bottom: 0.5px solid var(--border-color); transition: background-color 0.3s; }
-        .top-bar { padding: 12px 20px 5px 20px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        .top-bar-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-        
-        /* Top Dropdown Menu */
-        .top-dropdown-menu { display: none; position: absolute; right: 15px; top: 40px; background-color: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 12px; z-index: 1001; overflow: hidden; min-width: 180px; animation: popIn 0.2s ease forwards;}
-        .top-dropdown-item { padding: 12px 18px; font-size: 0.95rem; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background-color 0.2s; text-decoration: none; }
-        .top-dropdown-item:active { background-color: var(--input-bg); }
+        .login-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .login-subtitle { font-size: 15px; color: var(--tg-gray); margin-bottom: 40px; }
 
-        .sub-header { padding: 10px 20px 15px 20px; display: flex; align-items: center; gap: 14px; }
-        .app-logo { width: 42px; height: 42px; border-radius: 40%; object-fit: cover; }
-        .icon-box { background: var(--primary-blue); color: white; width: 42px; height: 42px; border-radius: 40%; font-weight: bold; font-style: italic; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;}
-        .sub-header h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+        .google-btn {
+            background-color: #fff; color: #757575; border: 1px solid #ddd;
+            padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%; justify-content: center;
+        }
+        .google-btn img { width: 24px; height: 24px; }
+        .google-btn:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
 
-        main { padding: 15px; min-height: 80vh; }
-        
-        /* Clean Native Cards */
-        .card { background-color: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 15px; border: none; transition: background-color 0.3s; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
+        /* Loading Screen */
+        #loadingScreen {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100vh;
+            background-color: rgba(255,255,255,0.9); flex-direction: column;
+            justify-content: center; align-items: center; z-index: 300; font-weight: bold; color: var(--tg-blue);
+        }
 
-        /* Telegram-style Inputs */
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; text-align: left; margin-left: 4px; }
-        .input-group input, .input-group select { background-color: var(--input-bg); border: 1px solid transparent; padding: 14px; border-radius: 12px; font-size: 1rem; color: var(--text-main); font-weight: 500; outline: none; width: 100%; -webkit-appearance: none; appearance: none; transition: all 0.2s ease; }
-        .input-group input:focus, .input-group select:focus { border-color: var(--primary-blue); background-color: var(--card-bg); }
-        .input-group input[type="date"], .input-group input[type="time"] { text-align: center; }
-        
-        /* Minimalist Checkboxes */
-        .checkbox-container { background-color: var(--input-bg); border-radius: 12px; padding: 12px; display: flex; justify-content: space-around; margin-bottom: 15px; transition: background-color 0.3s; }
-        .checkbox-item { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-main); font-weight: 500; cursor: pointer; }
-        .checkbox-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary-blue); border-radius: 6px; }
+        /* ================= MAIN APP ================= */
+        #mainApp { display: none; width: 100%; padding-bottom: 70px; }
 
-        /* Telegram-style Buttons */
-        .btn-primary, .btn-success, .btn-warning, .btn-danger { color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: transform 0.1s ease, opacity 0.2s ease; }
-        .btn-primary { background-color: var(--primary-blue); }
-        .btn-success { background-color: var(--success-green); }
-        .btn-warning { background-color: var(--warning-yellow); }
-        .btn-danger { background-color: var(--danger-red); }
-        .btn-primary:active, .btn-success:active, .btn-warning:active, .btn-danger:active { transform: scale(0.97); opacity: 0.9; }
+        header {
+            background-color: var(--tg-white); padding: 15px 20px; display: flex;
+            align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 10;
+        }
+        header h2 { font-size: 18px; font-weight: 600; }
 
-        .section-title { color: var(--primary-blue); font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 5px;}
-        
-        /* Tables */
-        .record-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; }
-        .record-table th { padding-bottom: 12px; color: var(--text-muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; border-bottom: 0.5px solid var(--border-color);}
-        .record-table td { padding: 14px 0; border-bottom: 0.5px solid var(--border-color); color: var(--text-main); vertical-align: middle; font-weight: 500;}
-        .record-table tr:last-child td { border-bottom: none; }
-        .text-blue { color: var(--primary-blue); font-weight: bold; }
-        .action-icons i { margin-left: 14px; font-size: 1.1rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s;}
-        .action-icons .icon-edit:active { color: var(--warning-yellow); }
-        .action-icons .icon-delete:active { color: var(--danger-red); }
-        
-        /* Clickable Row for History Details */
-        .clickable-row { cursor: pointer; transition: background-color 0.2s; border-radius: 8px;}
-        .clickable-row:active { background-color: var(--input-bg); }
-        .clickable-row td { padding-left: 5px; padding-right: 5px; }
-
-        /* Telegram Native Bottom Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--header-bg); border-top: 0.5px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; padding: 10px 5px; padding-bottom: max(10px, env(safe-area-inset-bottom)); z-index: 1000; transition: background-color 0.3s;}
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 0.65rem; gap: 4px; padding: 6px 12px; cursor: pointer; font-weight: 500; transition: color 0.2s ease;}
-        .nav-icon-wrapper { font-size: 1.4rem; transition: transform 0.2s ease; margin-bottom: 2px;}
-        .nav-item.active { color: var(--primary-blue); }
-        .nav-item.active .nav-icon-wrapper { transform: scale(1.1); }
-
-        .tab-content { display: none; animation: fadeIn 0.25s ease-out; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Modern Gradient Cards */
-        .net-salary-card { background: linear-gradient(135deg, #3390ec, #007aff); color: white; border-radius: 16px; padding: 35px 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(51, 144, 236, 0.3); border: none;}
-        .net-salary-card h1 { font-size: 2.8rem; font-weight: 700; margin-top: 5px; letter-spacing: -1px;}
-        
-        /* Folders (Telegram Style) */
-        .folder-wrapper { position: relative; margin-bottom: 12px; border-radius: 14px; overflow: hidden; background-color: var(--danger-red); }
-        .folder-card { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-radius: 14px; cursor: pointer; background-color: var(--card-bg); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 0; }
-        .folder-delete-bg { position: absolute; top: 0; right: 0; bottom: 0; width: 80px; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; z-index: 1; cursor: pointer; }
-        .folder-info { display: flex; align-items: center; gap: 15px; }
-        .folder-info i.fa-folder { color: var(--primary-blue); font-size: 2.2rem; }
-        
-        .summary-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 0.5px solid var(--border-color); font-size: 0.95rem; color: var(--text-main); font-weight: 500;}
-        .summary-row:last-child { border-bottom: none; }
-        .summary-row span:first-child { color: var(--text-muted); }
-        .summary-total { display: flex; justify-content: space-between; padding-top: 15px; margin-top: 5px; font-weight: 700; font-size: 1.2rem; color: var(--text-main); text-transform: uppercase;}
-        
-        #history-detail { display: none; }
-        .back-btn { color: var(--primary-blue); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-size: 1rem; padding: 5px 0;}
-        .cancel-edit { display: none; text-align: center; font-size: 0.9rem; color: var(--primary-blue); margin-top: 15px; cursor: pointer; font-weight: 600;}
+        .budget-card { background: var(--tg-blue); color: var(--tg-white); margin: 15px; padding: 20px; border-radius: 12px; }
+        .budget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; opacity: 0.95; }
+        .days-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 12px; }
+        .budget-summary { display: flex; justify-content: space-between; background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; }
+        .summary-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .summary-item:not(:last-child) { border-right: 1px solid rgba(255, 255, 255, 0.2); }
+        .summary-item span { font-size: 12px; opacity: 0.9; margin-bottom: 5px; }
+        .summary-item strong { font-size: 16px; font-weight: bold; }
 
-        /* Dynamic Inputs Row */
-        .custom-allow-row { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; align-items: center; }
-        .custom-allow-row input { background-color: var(--input-bg); border: 1px solid transparent; padding: 14px; border-radius: 10px; color: var(--text-main); font-size: 0.9rem; transition: 0.2s; outline: none;}
-        .custom-allow-row input:focus { border-color: var(--primary-blue); background-color: var(--card-bg); }
-        .custom-allow-btn { background-color: transparent; color: var(--danger-red); border: none; width: 44px; height: 44px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.2rem; opacity: 0.8;}
+        .section-box { background: var(--tg-white); padding: 15px; margin: 0 15px 15px 15px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .section-title { font-size: 14px; font-weight: 600; color: var(--tg-gray); margin-bottom: 15px; text-transform: uppercase; }
 
-        /* Telegram Style Modal */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; opacity: 0; transition: opacity 0.2s ease;}
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-box { background: var(--header-bg); border-radius: 16px; padding: 25px 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 90vh; }
-        .modal-overlay.active .modal-box { transform: scale(1); }
-        .modal-icon-wrapper { width: 60px; height: 60px; background: rgba(255, 59, 48, 0.1); color: var(--danger-red); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; margin: 0 auto 15px auto; }
-        .modal-title { font-size: 1.3rem; color: var(--text-main); margin-bottom: 10px; font-weight: 700; }
-        .modal-text { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; padding: 0 10px;}
-        .modal-actions { display: flex; gap: 12px; }
-        .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; border: none; outline: none; transition: 0.2s;}
-        .btn-modal-cancel { background: var(--input-bg); color: var(--primary-blue); }
-        .btn-modal-delete { background: var(--danger-red); color: white; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; }
+        .input-row { display: flex; gap: 10px; }
+        .input-row > div { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 13px; font-weight: 500; }
+        .input-group input { padding: 12px; border: 1px solid var(--tg-border); border-radius: 8px; font-size: 15px; outline: none; width: 100%; }
+        .input-group input:focus { border-color: var(--tg-blue); }
 
-        /* Settings specific tweaks */
-        .theme-btn { background: var(--input-bg); border: none; padding: 10px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s;}
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .btn-primary { background-color: var(--tg-blue); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 5px; }
+        .btn-danger-outline { background-color: transparent; color: var(--tg-red); border: 1px solid var(--tg-red); padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 15px; }
+
+        .expense-list { list-style: none; padding: 0 15px 20px 15px; display: flex; flex-direction: column; gap: 10px; }
+        .expense-item { background: var(--tg-white); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .expense-info { display: flex; flex-direction: column; gap: 4px; }
+        .expense-desc { font-size: 16px; font-weight: 500; }
+        .expense-date { font-size: 12px; color: var(--tg-gray); }
+        .expense-amount { font-size: 16px; font-weight: 600; color: var(--tg-red); }
         
-        /* Guide Content Styles */
-        .guide-content { overflow-y: auto; text-align: left; padding-right: 5px; font-size: 0.9rem; line-height: 1.7; color: var(--text-main); }
-        .guide-content b { color: var(--text-main); }
-        .guide-content ul { padding-left: 20px; margin-top: 5px; margin-bottom: 15px; }
-        .guide-content li { margin-bottom: 8px; }
+        .action-btns { display: flex; gap: 8px; margin-top: 8px; }
+        .action-btns button { border: none; background: none; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .edit-btn { color: var(--tg-blue); background: rgba(51, 144, 236, 0.1); }
+        .delete-btn { color: var(--tg-red); background: rgba(229, 57, 53, 0.1); }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: var(--tg-white); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--tg-border); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--tg-gray); cursor: pointer; font-size: 12px; gap: 4px; flex: 1; }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+        .nav-item.active { color: var(--tg-blue); }
+
+        .user-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .user-profile img { width: 50px; height: 50px; border-radius: 50%; }
+        .user-profile-info { display: flex; flex-direction: column; }
+        .user-profile-name { font-weight: bold; font-size: 16px; }
+        .user-profile-email { font-size: 13px; color: var(--tg-gray); }
     </style>
 </head>
 <body>
 
-    <div class="sticky-header-container">
-        <div class="top-bar">
-            <div class="top-bar-title" data-i18n="appTitle">OT Records</div>
-            <i class="fa-solid fa-ellipsis-vertical" style="color: var(--text-muted); font-size: 1.3rem; padding: 5px 10px; cursor: pointer;" onclick="toggleTopMenu(event)"></i>
-            
-            <div id="top-dropdown" class="top-dropdown-menu">
-                <div class="top-dropdown-item" onclick="openHelpModal()">
-                    <i class="fa-solid fa-circle-question" style="color: var(--primary-blue); font-size: 1.1rem;"></i> 
-                    <span data-i18n="userGuideMenu">User Guide</span>
-                </div>
-                <a href="https://t.me/+2qtPHQca075hNDc9" target="_blank" class="top-dropdown-item">
-                    <i class="fa-brands fa-telegram" style="color: #2CA5E0; font-size: 1.15rem;"></i> 
-                    <span data-i18n="communityGroupMenu">Community Group</span>
-                </a>
-            </div>
-        </div>
+<div class="app-container">
 
-        <div class="sub-header">
-            <img src="logo.png" class="app-logo" alt="App Logo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex';">
-            <div id="fallback-logo" class="icon-box" style="display: none;">OT</div>
-            <h2 id="page-title" data-i18n="recordsTab">Records</h2>
-        </div>
-    </div>
+    <div id="loadingScreen">Data များကို ဆွဲယူနေပါသည်...</div>
 
-    <main id="main-content">
-        <section id="tab-records" class="tab-content active">
-            <div class="card">
-                <input type="hidden" id="edit-id" value="">
-                
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label data-i18n="dateLabel" style="text-align: center;">DATE</label>
-                    <input type="date" id="rec-date">
-                </div>
-
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label data-i18n="inLabel" style="text-align: center;">IN</label>
-                        <input type="time" id="rec-in" value="20:00">
-                    </div>
-                    <div class="input-group">
-                        <label data-i18n="outLabel" style="text-align: center;">OUT</label>
-                        <input type="time" id="rec-out" value="08:05">
-                    </div>
-                </div>
-
-                <div class="grid-4">
-                    <div class="input-group">
-                        <label class="text-blue" data-i18n="dayLabel" style="text-align: center;">DAY</label>
-                        <input type="number" id="rec-day" value="1" step="0.5" style="color: var(--primary-blue); text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label style="text-align: center;">OT 1.5</label>
-                        <input type="number" id="rec-ot15" value="0" step="0.5" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label style="text-align: center;">OT 2.0</label>
-                        <input type="number" id="rec-ot20" value="0" step="0.5" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label style="text-align: center;">OT 3.0</label>
-                        <input type="number" id="rec-ot30" value="0" step="0.5" style="text-align: center;">
-                    </div>
-                </div>
-
-                <div class="checkbox-container">
-                    <label class="checkbox-item">
-                        <input type="checkbox" id="rec-night"> <span data-i18n="nightLabel">NIGHT</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" id="rec-meal"> <span data-i18n="mealLabel">MEAL</span>
-                    </label>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px 0;">
-                    <span style="color: var(--success-green); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="extraTitle">EXTRA ALLOWANCES (+)</span>
-                    <button style="background: transparent; color: var(--success-green); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('rec-extra')">+ Add</button>
-                </div>
-                <div id="rec-extra-container"></div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0;">
-                    <span style="color: var(--danger-red); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="expenseTitle">ADVANCES / EXPENSES (-)</span>
-                    <button style="background: transparent; color: var(--danger-red); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('rec-expense')">+ Add</button>
-                </div>
-                <div id="rec-expense-container"></div>
-
-                <button class="btn-primary" id="btn-save-record" onclick="saveRecord()" data-i18n="addBtnText" style="margin-top: 15px;">Add Record</button>
-                <div class="cancel-edit" id="btn-cancel-edit" onclick="cancelEdit()" data-i18n="cancelEdit">Cancel Edit</div>
-            </div>
-
-            <div class="card">
-                <div class="section-title" data-i18n="recentRecords">Recent Records</div>
-                <table class="record-table">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left;" data-i18n="dateLabel">DATE</th>
-                            <th data-i18n="inOutLabel">In/Out</th>
-                            <th class="text-blue" data-i18n="dayLabel">DAY</th>
-                            <th>1.5</th><th>2.0</th><th>3.0</th><th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="records-table-body"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="tab-history" class="tab-content">
-            <div id="history-list">
-                <div class="section-title" data-i18n="monthlyRecords" style="margin-top: 5px;">Monthly Records</div>
-                <div id="folder-container"></div>
-            </div>
-
-            <div id="history-detail">
-                <div class="back-btn" onclick="hideHistoryDetail()"><i class="fa-solid fa-chevron-left"></i> <span data-i18n="backBtn">Back</span></div>
-                
-                <div class="card" style="overflow-x: auto; padding: 15px;">
-                    <h3 style="color: var(--text-main); font-weight: 700; margin-bottom: 15px; font-size: 1.1rem;" id="detail-month-title">Month</h3>
-                    <table class="record-table" style="margin-bottom: 5px; min-width: 320px;">
-                        <thead>
-                            <tr>
-                                <th style="text-align: left;" data-i18n="dateLabel">Date</th>
-                                <th data-i18n="inOutLabel">In/Out</th>
-                                <th class="text-blue" data-i18n="dayLabel">Day</th>
-                                <th>1.5</th><th>2.0</th><th>3.0</th>
-                                <th style="text-align: right;" data-i18n="dailyTotal">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-detail-table"></tbody>
-                    </table>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 10px; font-style: italic;" data-i18n="tapRowInfo">Tap a row for details</div>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: var(--text-main);" data-i18n="monthlySummary">Monthly Summary</h3>
-                    <div id="summary-content"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="tab-calculator" class="tab-content">
-            <div class="net-salary-card">
-                <h3 data-i18n="netSalary" style="font-weight: 500; font-size: 1.1rem; opacity: 0.9;">Net Salary</h3>
-                <h1 id="calc-result">0</h1>
-            </div>
-
-            <div class="card">
-                <div class="section-title" data-i18n="manualInput">Manual Input</div>
-                
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label style="color: var(--primary-blue);" data-i18n="calcRegDays">REGULAR DAYS</label>
-                    <input type="number" id="calc-reg" value="0">
-                </div>
-
-                <div class="grid-3">
-                    <div class="input-group">
-                        <label>OT 1.5</label>
-                        <input type="number" id="calc-ot15" value="0" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label>OT 2.0</label>
-                        <input type="number" id="calc-ot20" value="0" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label>OT 3.0</label>
-                        <input type="number" id="calc-ot30" value="0" style="text-align: center;">
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label data-i18n="nightShifts">NIGHT SHIFTS</label>
-                        <input type="number" id="calc-night" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label data-i18n="mealDays">MEAL DAYS</label>
-                        <input type="number" id="calc-meal" value="0">
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px 0;">
-                    <span style="color: var(--success-green); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="extraTitle">EXTRA ALLOWANCES (+)</span>
-                    <button style="background: transparent; color: var(--success-green); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('calc-extra')">+ Add</button>
-                </div>
-                <div id="calc-extra-container"></div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0;">
-                    <span style="color: var(--danger-red); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="expenseTitle">ADVANCES / EXPENSES (-)</span>
-                    <button style="background: transparent; color: var(--danger-red); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('calc-expense')">+ Add</button>
-                </div>
-                <div id="calc-expense-container"></div>
-
-                <button class="btn-primary" onclick="calculateManual()" data-i18n="calcNow" style="margin-top: 15px;">Calculate Now</button>
-            </div>
-
-            <div class="card" id="calc-summary-container" style="display: none;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: var(--text-main);" data-i18n="calculationSummary">Calculation Summary</h3>
-                <div id="calc-summary-content"></div>
-            </div>
-        </section>
-
-        <section id="tab-settings" class="tab-content">
-            <div class="settings-header">
-                <div class="section-title" style="margin: 0;" data-i18n="settingsTab">App Settings</div>
-                <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i> <span data-i18n="themeBtn">Theme</span></button>
-            </div>
-
-            <div class="card">
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label data-i18n="languageLabel">LANGUAGE</label>
-                    <select id="app-language" onchange="changeLanguage()" style="color: var(--primary-blue); font-weight: 600;">
-                        <option value="en">English (အင်္ဂလိပ်)</option>
-                        <option value="mm">မြန်မာ (Myanmar)</option>
-                    </select>
-                </div>
-
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label data-i18n="empType">EMPLOYMENT TYPE</label>
-                    <select id="set-emp-type" onchange="toggleEmpType()" style="color: var(--success-green); font-weight: 600;">
-                        <option value="daily" data-i18n="typeDaily">Daily Wage</option>
-                        <option value="monthly" data-i18n="typeMonthly">Monthly Salary</option>
-                    </select>
-                </div>
-
-                <div style="background: var(--input-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase;" data-i18n="payrollCycle">PAYROLL CYCLE</div>
-                    <div class="grid-2" style="margin-bottom: 0;">
-                        <div class="input-group">
-                            <label class="text-blue" data-i18n="startDay" style="text-align: center;">START</label>
-                            <input type="number" id="set-start" value="21" style="color: var(--primary-blue); text-align: center; background: var(--card-bg);">
-                        </div>
-                        <div class="input-group">
-                            <label style="color: var(--danger-red); text-align: center;" data-i18n="endDay">END</label>
-                            <input type="number" id="set-end" value="20" style="color: var(--danger-red); text-align: center; background: var(--card-bg);">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label id="lbl-wage" data-i18n="dailyWage">DAILY WAGE</label>
-                    <input type="number" id="set-wage" value="372" oninput="autoCalculateRates()" style="font-size: 1.2rem; color: var(--primary-blue); font-weight: 700;">
-                </div>
-
-                <div class="grid-2" style="margin-bottom: 20px;">
-                    <div class="input-group">
-                        <label style="color: var(--danger-red);" data-i18n="ssoLabel">SSO DEDUCTION (%)</label>
-                        <input type="number" id="set-sso" value="5" step="0.1" style="color: var(--danger-red); font-weight: 600; text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label style="color: var(--danger-red);" data-i18n="ssoMaxLabel">MAX AMOUNT</label>
-                        <input type="number" id="set-sso-max" value="750" style="color: var(--danger-red); font-weight: 600; text-align: center;">
-                    </div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="input-group">
-                        <label data-i18n="ot15Rate" style="text-align: center;">OT 1.5 Rate</label>
-                        <input type="number" id="set-ot15" value="69.75" step="0.01" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label data-i18n="ot20Rate" style="text-align: center;">OT 2.0 Rate</label>
-                        <input type="number" id="set-ot20" value="93" step="0.01" style="text-align: center;">
-                    </div>
-                    <div class="input-group">
-                        <label data-i18n="ot30Rate" style="text-align: center;">OT 3.0 Rate</label>
-                        <input type="number" id="set-ot30" value="139.5" step="0.01" style="text-align: center;">
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label data-i18n="nightAllow">NIGHT ALLOW.</label>
-                        <input type="number" id="set-night" value="60">
-                    </div>
-                    <div class="input-group">
-                        <label data-i18n="mealAllow">MEAL ALLOW.</label>
-                        <input type="number" id="set-meal" value="30">
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 25px 0 10px 0;">
-                    <span style="color: var(--success-green); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="settingsExtraTitle">CUSTOM ALLOWANCES (Fixed)</span>
-                    <button style="background: transparent; color: var(--success-green); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('set-extra')">+ Add</button>
-                </div>
-                <div id="set-extra-container"></div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 25px 0 10px 0;">
-                    <span style="color: var(--danger-red); font-weight: 600; font-size: 0.85rem; text-transform: uppercase;" data-i18n="settingsExpenseTitle">CUSTOM EXPENSES (Fixed)</span>
-                    <button style="background: transparent; color: var(--danger-red); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer;" onclick="addDynamicRow('set-expense')">+ Add</button>
-                </div>
-                <div id="set-expense-container"></div>
-
-                <button class="btn-success" onclick="saveSettings()" style="margin-top: 20px;" data-i18n="saveSettingsBtn">Save All Settings</button>
-            </div>
-        </section>
-    </main>
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('records', this)" id="nav-records">
-            <div class="nav-icon-wrapper"><i class="fa-solid fa-clipboard-list"></i></div>
-            <span data-i18n="recordsTab">Records</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('history', this)" id="nav-history">
-            <div class="nav-icon-wrapper"><i class="fa-solid fa-folder-open"></i></div>
-            <span data-i18n="historyTab">History</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('calculator', this)" id="nav-calculator">
-            <div class="nav-icon-wrapper"><i class="fa-solid fa-calculator"></i></div>
-            <span data-i18n="calcTab">Calculator</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('settings', this)" id="nav-settings">
-            <div class="nav-icon-wrapper"><i class="fa-solid fa-gear"></i></div>
-            <span data-i18n="settingsTab">Settings</span>
-        </div>
-    </nav>
-
-    <div id="help-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 90%; padding: 20px; max-height: 85vh;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 class="modal-title" style="margin: 0; color: var(--primary-blue);" data-i18n="userGuideMenu">User Guide</h3>
-                <i class="fa-solid fa-xmark" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 5px;" onclick="closeHelpModal()"></i>
-            </div>
-            <div id="help-content" class="guide-content"></div>
-        </div>
-    </div>
-
-    <div id="delete-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-icon-wrapper">
-                <i class="fa-solid fa-trash-can"></i>
-            </div>
-            <h3 class="modal-title" data-i18n="deleteTitle">Delete Record?</h3>
-            <p class="modal-text" data-i18n="deleteMsg">Are you sure you want to delete this record?</p>
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="closeDeleteModal()" data-i18n="modalCancelBtn">Cancel</button>
-                <button class="btn-modal-delete" onclick="confirmDelete()" data-i18n="modalDeleteBtn">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="delete-folder-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-icon-wrapper">
-                <i class="fa-solid fa-folder-minus"></i>
-            </div>
-            <h3 class="modal-title" data-i18n="deleteFolderTitle">Delete Folder?</h3>
-            <p class="modal-text" data-i18n="deleteFolderMsg">Are you sure you want to delete ALL records in this cycle?</p>
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="closeDeleteFolderModal()" data-i18n="modalCancelBtn">Cancel</button>
-                <button class="btn-modal-delete" onclick="proceedDeleteFolder()" data-i18n="modalDeleteBtn">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="daily-detail-modal" class="modal-overlay">
-        <div class="modal-box" style="text-align: left; padding: 25px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 class="modal-title" style="margin: 0; color: var(--primary-blue);" id="daily-detail-title">Date</h3>
-                <i class="fa-solid fa-xmark" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 5px;" onclick="closeDailyDetailModal()"></i>
-            </div>
-            <div id="daily-detail-content" style="font-size: 0.95rem;"></div>
-            <button class="btn-primary" style="margin-top: 20px;" onclick="closeDailyDetailModal()" data-i18n="modalCloseBtn">Close</button>
-        </div>
-    </div>
-
-    <script>
-        const i18n = {
-            en: {
-                appTitle: "OT Records", recordsTab: "Records", historyTab: "History", calcTab: "Calculator", settingsTab: "Settings",
-                dateLabel: "DATE", inLabel: "IN", outLabel: "OUT", dayLabel: "DAY", inOutLabel: "In/Out",
-                nightLabel: "NIGHT", mealLabel: "MEAL", addBtnText: "Add Record", cancelEdit: "Cancel Edit",
-                extraTitle: "EXTRA ALLOWANCES (+)", expenseTitle: "ADVANCES / EXPENSES (-)",
-                settingsExtraTitle: "CUSTOM ALLOWANCES (Fixed)", settingsExpenseTitle: "CUSTOM EXPENSES (Fixed)",
-                recentRecords: "Recent Records", monthlyRecords: "Monthly Records", backBtn: "Back", monthlySummary: "Monthly Summary",
-                dailyTotal: "Total", netSalary: "Net Salary", manualInput: "Manual Input", calcRegDays: "REGULAR DAYS",
-                nightShifts: "NIGHT SHIFTS", mealDays: "MEAL DAYS", calcNow: "Calculate Now", themeBtn: "Theme",
-                languageLabel: "LANGUAGE", payrollCycle: "PAYROLL CYCLE", startDay: "START DAY", endDay: "END DAY",
-                empType: "EMPLOYMENT TYPE", typeDaily: "Daily Wage", typeMonthly: "Monthly Salary",
-                dailyWage: "DAILY WAGE", monthlySalary: "MONTHLY SALARY", ot15Rate: "OT 1.5 Rate", ot20Rate: "OT 2.0 Rate", ot30Rate: "OT 3.0 Rate",
-                ssoLabel: "SSO DEDUCTION (%)", ssoMaxLabel: "MAX AMOUNT", ssoName: "SSO Deduction", nightAllow: "NIGHT ALLOW.", mealAllow: "MEAL ALLOW.", 
-                basicPay: "Basic Pay", netTotal: "NET TOTAL", calcInfo: "Rates and fixed allowances are taken from Settings automatically.",
-                deleteTitle: "Delete Record?", deleteMsg: "Are you sure you want to delete this record? This action cannot be undone.",
-                modalCancelBtn: "Cancel", modalDeleteBtn: "Delete", modalCloseBtn: "Close", tapRowInfo: "Tap a row to see calculation details",
-                deleteFolderTitle: "Delete Folder?", deleteFolderMsg: "Are you sure you want to delete ALL records in this payroll cycle?",
-                calculationSummary: "Calculation Summary", addCustomBtn: "Add", advancePayTitle: "Advance", userGuideMenu: "User Guide", communityGroupMenu: "Community Group",
-                helpContent: `
-                    <strong>📱 OT Records App Complete Guide</strong><br><br>
-                    This App helps you accurately calculate your salary, overtime (OT), piecemeal work, and other deductions. Please read the following 4 sections carefully.<br><br>
-
-                    <strong style="color:var(--primary-blue);">⚙️ Step 1 - Settings Configuration</strong><br>
-                    Before using the app, you must configure your salary rules in Settings.<br>
-                    <ul>
-                        <li><b>Theme and Language:</b> Tap "Theme" at the top right to switch between dark/light mode, and choose English/Myanmar.</li>
-                        <li><b>Employment Type:</b> Choose whether you are on a Daily Wage or Monthly Salary.</li>
-                        <li><b>Payroll Cycle:</b> Enter your factory's payroll cut-off dates.<br>(e.g., If it's from the 21st to the 20th, enter START: 21, END: 20).</li>
-                        <li><b>Wage & Allowances:</b> Enter your basic pay. Ensure the SSO percentage, night allowance, and meal allowance rates are correct.</li>
-                        <li><b>📌 Fixed Allowances/Expenses:</b> If you receive a monthly fixed bonus (e.g., 800 baht Attendance Bonus), tap <b>+ Add</b> here. Name it "Attendance Bonus" and set the amount to "800". It will automatically be added at the end of the month.</li>
-                    </ul>
-                    <i>Note: After filling out everything, make sure to tap "Save All Settings" at the bottom.</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">📝 Step 2 - Adding Daily Records</strong><br>
-                    Log your daily work details here.<br>
-                    <ul>
-                        <li><b>Date and Time:</b> Select your work date, IN, and OUT times.</li>
-                        <li><b>DAY Assignment (Very Important):</b> Set to 1 for a full regular day. Change to 0.5 for a half-day. Set to 0 if you take a leave (absent).</li>
-                        <li><b>OT Hours:</b> Enter the amount of OT hours worked under the correct multiplier category (1.5, 2.0, 3.0).</li>
-                        <li><b>Night / Meal:</b> Check the box (✔) on days you receive these.</li>
-                    </ul>
-                    <b>💡 How to add dynamic Extra/Deductions:</b><br>
-                    You can add conditional bonuses or deductions using the "+ Add" buttons below.<br>
-                    <ul>
-                        <li><b>🌟 Example 1 - Piecemeal Work ("Fixed Pay"):</b><br>
-                        Suppose you did piecemeal work for 500 baht today. To avoid adding your standard daily wage (e.g., 372 baht) on top of it, you MUST change the top 'DAY' input from <b>1 to 0</b>. Keep all OT fields at 0. Then, under "Extra Allowances (+)", tap + Add, name it "Piecemeal" and enter "500".<br>
-                        <i>(Note: If you do a 400 baht piecemeal job another day, repeat this process: DAY = 0, name = "Piecemeal", amount = "400". The app will group them neatly in your monthly summary.)</i></li>
-                        <li><b>Example 2 - Special Allowance:</b> If you get a 20 baht "Sleep Allowance" for night guard duty, tap + Add, name it "Sleep Allowance" and enter "20".</li>
-                        <li><b>Example 3 - Advance (-):</b> If you take a 500 baht advance, go to "Advances / Expenses (-)", tap + Add, name it "Advance", and enter "500" (no minus sign needed, the app deducts it automatically).</li>
-                    </ul>
-                    If everything is correct, tap "Add Record".<br>
-                    <i>(To Edit/Delete: In the 'Recent Records' list below, tap ✏️ to edit or 🗑️ to delete.)</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">📂 Step 3 - Checking History</strong><br>
-                    Compare these records with your official payslip at the end of the month.<br>
-                    <ul>
-                        <li><b>Folders:</b> Tap on your desired payroll cycle folder (e.g., 21 Feb - 20 Mar).</li>
-                        <li><b>Daily Detail:</b> Tap on any individual row to see a detailed Pop-up explaining exactly how the basic pay, OT, and deductions were calculated for that specific day.</li>
-                        <li><b>📊 Monthly Summary:</b> At the bottom, you will see a neatly calculated summary of your basic pay, OT, and night allowances. You will also see your dynamic inputs grouped together, like "Sleep Allowance (2 x 20) = + 40" or "Piecemeal (1 x 500) + (1 x 400) = + 900".</li>
-                    </ul>
-                    <i>(Swipe Left on a folder to delete the entire month's records.)</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">🧮 Step 4 - Calculator</b><br>
-                    Use this for quick, rough estimates without saving daily records.<br>
-                    <ul>
-                        <li>Enter total regular days worked, total OT hours, etc., and tap "Calculate Now" to instantly see your estimated total.</li>
-                    </ul>
-                    <i>(Calculations here are not saved.)</i>
-                `
-            },
-            mm: {
-                appTitle: "အချိန်ပိုမှတ်တမ်း", recordsTab: "မှတ်တမ်းများ", historyTab: "လစဉ်အနှစ်ချုပ်", calcTab: "တွက်ချက်ရန်", settingsTab: "ဆက်တင်များ",
-                dateLabel: "ရက်စွဲ", inLabel: "အဝင်", outLabel: "အထွက်", dayLabel: "ရက်", inOutLabel: "ဝင်/ထွက်",
-                nightLabel: "ညဆိုင်း", mealLabel: "ထမင်းဖိုး", addBtnText: "မှတ်တမ်းထည့်မည်", cancelEdit: "မပြင်တော့ပါ",
-                extraTitle: "အပိုရငွေများ (+)", expenseTitle: "ကြိုတင်ငွေ / ဖြတ်ငွေများ (-)",
-                settingsExtraTitle: "ပုံမှန် အပိုရငွေများ", settingsExpenseTitle: "ပုံမှန် ဖြတ်ငွေများ",
-                recentRecords: "လတ်တလောမှတ်တမ်းများ", monthlyRecords: "လအလိုက်မှတ်တမ်းများ", backBtn: "နောက်သို့", monthlySummary: "လစဉ်အနှစ်ချုပ်",
-                dailyTotal: "စုစုပေါင်း", netSalary: "ရရှိမည့်လစာ", manualInput: "ကိုယ်တိုင်တွက်ရန်", calcRegDays: "ပုံမှန်ရက်များ",
-                nightShifts: "ညဆိုင်းရက်", mealDays: "ထမင်းဖိုးရက်", calcNow: "ယခုတွက်မည်", themeBtn: "အသွင်အပြင်",
-                languageLabel: "ဘာသာစကား (LANGUAGE)", payrollCycle: "လစာထုတ်ရက်စက်ဝန်း", startDay: "စတင်ရက်", endDay: "ဆုံးရက်",
-                empType: "ဝန်ထမ်းအမျိုးအစား", typeDaily: "နေ့စား (Daily Wage)", typeMonthly: "လစာစား (Monthly Salary)",
-                dailyWage: "တစ်နေ့စာ လုပ်အားခ", monthlySalary: "တစ်လစာ အခြေခံလစာ", ot15Rate: "OT 1.5 နှုန်း", ot20Rate: "OT 2.0 နှုန်း", ot30Rate: "OT 3.0 နှုန်း",
-                ssoLabel: "လူမှုဖူလုံရေး (%)", ssoMaxLabel: "အများဆုံး ဖြတ်မည့်ပမာဏ", ssoName: "လူမှုဖူလုံရေး ဖြတ်ငွေ", nightAllow: "ညဆိုင်းကြေး", mealAllow: "ထမင်းဖိုးကြေး", 
-                basicPay: "အခြေခံလစာ", netTotal: "စုစုပေါင်းလစာ", calcInfo: "ဆက်တင်ထဲရှိ နှုန်းထားများနှင့် ပုံမှန်ခံစားခွင့်များကို အလိုအလျောက် ထည့်သွင်းပေါင်းပေးပါသည်။",
-                deleteTitle: "မှတ်တမ်းဖျက်မည်လား?", deleteMsg: "ဤမှတ်တမ်းကို ဖျက်ရန် သေချာပါသလား?",
-                modalCancelBtn: "မလုပ်တော့ပါ", modalDeleteBtn: "ဖျက်မည်", modalCloseBtn: "ပိတ်မည်", tapRowInfo: "အသေးစိတ်ကြည့်ရန် မှတ်တမ်းကိုနှိပ်ပါ",
-                deleteFolderTitle: "ဖိုင်တွဲကို ဖျက်မည်လား?", deleteFolderMsg: "ဤလစာစက်ဝန်းရှိ မှတ်တမ်းအားလုံးကို ဖျက်မှာ သေချာပါသလား?",
-                calculationSummary: "တွက်ချက်မှု အနှစ်ချုပ်", addCustomBtn: "+ ထည့်မည်", advancePayTitle: "ကြိုတင်ငွေ", userGuideMenu: "အသုံးပြုနည်း လမ်းညွှန်", communityGroupMenu: "Community Group",
-                helpContent: `
-                    <strong>📱 OT Records (အချိန်ပိုမှတ်တမ်း) အက်ပ် အသုံးပြုနည်း လမ်းညွှန် အပြည့်အစုံ</strong><br><br>
-                    ဒီ App သည် လစာ၊ အချိန်ပို (OT)၊ အပြတ်လုပ်ခ နှင့် အခြားရငွေ/ဖြတ်ငွေများကို အမှားအယွင်းမရှိ အလွယ်တကူ တွက်ချက်နိုင်ရန် ကူညီပေးမည့် App ဖြစ်ပါသည်။ အောက်ပါ အဆင့် (၄) ဆင့်ကို သေချာစွာ ဖတ်ရှုလေ့လာပါ။<br><br>
-
-                    <strong style="color:var(--primary-blue);">⚙️ အဆင့် (၁) - ဆက်တင်များ (Settings) ကို ချိန်ညှိခြင်း</strong><br>
-                    App ကို စသုံးသည်နှင့် မိမိ၏ လစာစည်းမျဉ်းများကို ဆက်တင်များ တွင် အရင်ဆုံး သတ်မှတ်ပေးရပါမည်။<br>
-                    <ul>
-                        <li><b>ဘာသာစကား နှင့် အသွင်အပြင်:</b> မြန်မာ/English ရွေးချယ်နိုင်ပြီး၊ ညာဘက်အပေါ်ထောင့်ရှိ "Theme" ခလုတ်ဖြင့် အမည်းရောင်/အဖြူရောင် ပြောင်းနိုင်ပါသည်။</li>
-                        <li><b>ဝန်ထမ်းအမျိုးအစား:</b> မိမိသည် နေ့စား (Daily Wage) လား၊ လစာစား (Monthly Salary) လား ရွေးပါ။</li>
-                        <li><b>လစာထုတ်ရက်စက်ဝန်း (Payroll Cycle):</b> စက်ရုံမှ လစာဖြတ်သည့်ရက်ကို ထည့်ပါ။<br>(ဥပမာ - လဆန်း ၂၁ မှ နောက်လ ၂၀ အထိဆိုလျှင် START တွင် 21၊ END တွင် 20 ဟု ထည့်ပါ။)</li>
-                        <li><b>လုပ်အားခ နှင့် ခံစားခွင့်များ:</b> မိမိ၏ တစ်ရက်စာ လုပ်အားခ (သို့) အခြေခံလစာ၊ လူမှုဖူလုံရေး (SSO) ဖြတ်မည့် ရာခိုင်နှုန်း၊ ညဆိုင်းကြေး၊ ထမင်းဖိုး နှုန်းထားများကို မှန်ကန်စွာ ထည့်ပါ။</li>
-                        <li><b>📌 ပုံမှန် အပိုရငွေ / ဖြတ်ငွေများ (Fixed Allowances):</b> လစဉ် ပုံမှန်ရနေကျဖြစ်သော "ရက်မှန်ကြေး ၈၀၀ ဘတ်" ကဲ့သို့သော အရာများရှိပါက ဤနေရာတွင် <b>+ ထည့်မည်</b> ကိုနှိပ်ပါ။ အမည်တွင် "ရက်မှန်ကြေး"၊ ပမာဏတွင် "800" ဟု ကြိုတင်ထည့်ထားပါ။ လကုန်လျှင် လစာထဲသို့ အလိုလို ပေါင်းထည့်ပေးသွားပါမည်။</li>
-                    </ul>
-                    <i>သတိပြုရန်: အားလုံးဖြည့်ပြီးတိုင်း အောက်ဆုံးရှိ "ဆက်တင်များ သိမ်းဆည်းမည် (Save All Settings)" ကို မဖြစ်မနေ နှိပ်ပါ။</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">📝 အဆင့် (၂) - ရက်အလိုက် မှတ်တမ်းများ (Records) သွင်းခြင်း</strong><br>
-                    အလုပ်ဆင်းပြီးတိုင်း နေ့တိုင်းမှတ်တမ်းကို ဤနေရာတွင် ဝင်ရောက်မှတ်သားရပါမည်။<br>
-                    <ul>
-                        <li><b>ရက်စွဲ နှင့် အချိန်:</b> အလုပ်ဆင်းသည့် ရက်စွဲ၊ အဝင် (IN) နှင့် အထွက် (OUT) အချိန်ကို ရွေးပါ။</li>
-                        <li><b>ရက် (DAY) သတ်မှတ်ခြင်း (အလွန်အရေးကြီးပါသည်):</b> အလုပ်တစ်ရက်အပြည့်ဆင်းလျှင် 1 ဟုထားပါ။ ရက်ဝက်ဆင်းလျှင် 0.5၊ ခွင့်ယူလျှင် (အလုပ်မဆင်းလျှင်) 0 ဟုထားပါ။</li>
-                        <li><b>OT နာရီများ ထည့်သွင်းခြင်း:</b> မိမိဆင်းသည့် OT အမျိုးအစား (1.5, 2.0, 3.0) အောက်တွင် ဆင်းသည့်နာရီ အရေအတွက်ကို ရိုက်ထည့်ပါ။</li>
-                        <li><b>ညဆိုင်း / ထမင်းဖိုး:</b> ရရှိသည့်ရက်များတွင် အမှန်ခြစ် (✔) ခြစ်ပေးပါ။</li>
-                    </ul>
-                    <b>💡 ပုံမှန်မဟုတ်သော အထူးရငွေများ နှင့် ဖြတ်ငွေများ ထည့်သွင်းနည်း:</b><br>
-                    ပုံမှန်လုပ်အားခအပြင် အခြေအနေအရ ပြောင်းလဲရရှိတတ်သော အပိုကြေးများကို အောက်ဘက်ရှိ "အပိုရငွေများ (+)" တွင် + ထည့်မည် ကိုနှိပ်၍ ထည့်နိုင်ပါသည်။<br>
-                    <ul style="background: rgba(255,204,0,0.1); padding: 15px 15px 15px 35px; border-radius: 8px; border-left: 3px solid var(--warning-yellow);">
-                        <li><b style="color: var(--danger-red);">🌟 ဥပမာ (၁) - ပစ္စည်းပြီးသလောက်သာ ပိုက်ဆံရသော "အပြတ်လုပ်ရက်" မှတ်နည်း:</b><br>
-                        ဒီရက်တွင် ပုံမှန်အလုပ်မဟုတ်ဘဲ အပြတ်လုပ်ခ ၅၀၀ ဘတ် ရမည့်အလုပ် လုပ်ခဲ့ရသည် ဆိုပါစို့။ <b>ပုံမှန် နေ့စားခ (ဥပမာ - ၃၇၂ ဘတ်) မပေါင်းသွားစေရန် အပေါ်ဆုံးရှိ ရက် (DAY) နေရာတွင် 1 အစား <u style="font-size: 1.1rem;">0 (သုည)</u> ဟု မဖြစ်မနေ ပြင်ထားပါ။</b> OT အကွက်များအားလုံးကိုလည်း 0 ဟုသာ ထားခဲ့ပါ။ ပြီးလျှင် အောက်ရှိ "အပိုရငွေများ (+)" တွင် + ထည့်မည် ကိုနှိပ်ပြီး အမည်နေရာတွင် "အပြတ်လုပ်ခ"၊ ပမာဏတွင် "500" ဟု ထည့်ပါ။<br>
-                        <i>(မှတ်ချက် - နောက်ရက်များတွင် ၄၀၀ ဘတ်တန် အပြတ်အလုပ် ထပ်လုပ်ရလျှင်လည်း ဤနည်းအတိုင်း DAY ကို 0 ထားပြီး အမည်တွင် "အပြတ်လုပ်ခ"၊ ပမာဏတွင် "400" ဟု ထပ်ထည့်နိုင်ပါသည်။ လကုန်လျှင် "အပြတ်လုပ်ခ" ခေါင်းစဉ်တစ်ခုတည်းအောက်တွင် အားလုံးကို စုပေါင်းပြပေးပါမည်။)</i></li>
-                    </ul>
-                    <ul>
-                        <li><b>ဥပမာ (၂) - အိပ်ငိုက်ကြေး:</b> ညဘက်စက်စောင့်ရ၍ အိပ်ငိုက်ကြေး ၂၀ ဘတ် ရသောရက်ဖြစ်ပါက + ထည့်မည် ကိုနှိပ်ပြီး အမည်တွင် "အိပ်ငိုက်ကြေး"၊ ပမာဏတွင် "20" ဟု ထည့်ပါ။</li>
-                        <li><b>ဥပမာ (၃) - ကြိုထုတ်ငွေ (-):</b> ရုံးခန်းမှ ၅၀၀ ဘတ် ကြိုထုတ်လျှင် အောက်ဆုံးရှိ ကြိုတင်ငွေ / ဖြတ်ငွေများ (-) အောက်တွင် + ထည့်မည် ကိုနှိပ်၍ အမည်တွင် "ကြိုထုတ်ငွေ"၊ ပမာဏတွင် "500" ဟု ထည့်ပါ။ (အနှုတ်လက္ခဏာ ရိုက်ထည့်ရန်မလိုပါ၊ App မှ အလိုလို နှုတ်ပေးပါမည်)။</li>
-                    </ul>
-                    အားလုံးမှန်ကန်ပါက "မှတ်တမ်းထည့်မည် (Add Record)" ကို နှိပ်လိုက်ပါ။<br>
-                    <i>(မှတ်တမ်း ပြင်လို/ဖျက်လိုပါက အောက်ရှိ လတ်တလောမှတ်တမ်းများ စာရင်းတွင် ခဲတံပုံ ✏️ နှင့် အမှိုက်ပုံးပုံ 🗑️ ကို နှိပ်၍ ပြုလုပ်နိုင်ပါသည်။)</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">📂 အဆင့် (၃) - လစဉ်အနှစ်ချုပ် (History) ဖြင့် လစာစစ်ဆေးခြင်း</strong><br>
-                    လကုန်၍ ရုံးခန်းမှ လစာထွက်လာသောအခါ မိမိတွက်ထားသည်နှင့် တိုက်စစ်ရန် ဤနေရာကို ဝင်ပါ။<br>
-                    <ul>
-                        <li><b>ဖိုင်တွဲများ:</b> မိမိကြည့်လိုသော လစာစက်ဝန်း (ဥပမာ - 21 Feb - 20 Mar) ဖိုင်တွဲကို နှိပ်ဝင်ပါ။</li>
-                        <li><b>ရက်အလိုက်အသေးစိတ် (Daily Detail):</b> စာရင်းဇယားမှ မှတ်တမ်း တစ်ကြောင်းချင်းစီကို လက်ဖြင့် ထပ်နှိပ်ကြည့်ပါက ထိုရက်အတွက် အခြေခံလုပ်ခ၊ OT၊ ဖြတ်ငွေများကို မည်သို့ တွက်ထားကြောင်း အသေးစိတ် ပြပေးပါမည်။</li>
-                        <li><b>📊 လစဉ်အနှစ်ချုပ် (Monthly Summary):</b> စာမျက်နှာ၏ အောက်ဆုံးတွင် တစ်လစာ အခြေခံလစာ၊ OT၊ ညဆိုင်းကြေးများအပြင် သင်ရက်တိုင်း ထည့်သွင်းခဲ့သော "အိပ်ငိုက်ကြေး (2 x 20) = + 40"၊ "အပြတ်လုပ်ခ (1 x 500) + (1 x 400) = + 900" များနှင့် ဆက်တင်တွင် ထည့်ခဲ့သော "ရက်မှန်ကြေး (Fixed) = + 800" တို့ကို အမည်တူရာ စုပေါင်း၍ သပ်ရပ်စွာ တွက်ချက်ပေးထားသည်ကို တွေ့မြင်ရမည် ဖြစ်ပါသည်။</li>
-                    </ul>
-                    <i>(ဖိုင်တွဲတစ်ခုလုံးကို ဖျက်လိုပါက ဖိုင်တွဲကို ဘယ်ဘက်သို့ ဖိဆွဲ (Swipe Left) ၍ ဖျက်နိုင်ပါသည်။)</i><br><br>
-
-                    <strong style="color:var(--primary-blue);">🧮 အဆင့် (၄) - တွက်ချက်ရန် (Calculator) (အမြန်တွက်စက်)</strong><br>
-                    မှတ်တမ်းထဲတွင် တစ်ရက်ချင်းစီ လိုက်မမှတ်ထားဘဲ၊ အကြမ်းဖျင်း လစာမည်မျှရမည်ကို အမြန်တွက်ကြည့်လိုပါက သုံးရန်ဖြစ်ပါတယ်။<br>
-                    <ul>
-                        <li>တစ်လစာ အလုပ်ဆင်းသည့် ပုံမှန်ရက်များ၊ OT စုစုပေါင်း နာရီ စသည်တို့ကို ပေါင်းထည့်ပြီး "ယခုတွက်မည်" ကို နှိပ်လိုက်ရုံဖြင့် အသားတင်လစာကို ချက်ချင်း ထုတ်ပေးပါမည်။</li>
-                    </ul>
-                    <i>(ဤနေရာတွင် တွက်ချက်မှုများသည် မှတ်တမ်းထဲတွင် သိမ်းဆည်းမည် မဟုတ်ပါ)</i>
-                `
-            }
-        };
-
-        let appSettings = JSON.parse(localStorage.getItem('ot_settings_v3')) || {
-            empType: 'daily', // NEW: 'daily' or 'monthly'
-            wage: 372, ot15: 69.75, ot20: 93, ot30: 139.5, night: 60, meal: 30, startDay: 21, endDay: 20, 
-            ssoPercent: 5, ssoMax: 750,
-            isDarkMode: false, language: 'en', customAllowances: [], customExpenses: []
-        };
-        let appRecords = JSON.parse(localStorage.getItem('ot_records_v4')) || [];
+    <div id="loginScreen">
+        <div class="login-logo">B</div>
+        <h1 class="login-title">Budget Tracker</h1>
+        <p class="login-subtitle">သင်၏ အသုံးစရိတ်များကို စနစ်တကျ မှတ်သားပါ</p>
         
-        let recordToDeleteId = null;
-        let cycleToDelete = null; 
+        <button class="google-btn" onclick="signInWithGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo">
+            Sign in with Google
+        </button>
+    </div>
 
-        const tabOrder = ['records', 'history', 'calculator', 'settings'];
-        let currentTabIndex = 0;
+    <div id="mainApp">
+        <header>
+            <h2 id="headerTitle">Home</h2>
+        </header>
 
-        window.onload = () => {
-            document.getElementById('rec-date').valueAsDate = new Date();
-            
-            if(appSettings.customAllowances && appSettings.customAllowances.some(a => a.amount < 0)) {
-                appSettings.customExpenses = appSettings.customAllowances.filter(a => a.amount < 0).map(a => ({name: a.name, amount: Math.abs(a.amount)}));
-                appSettings.customAllowances = appSettings.customAllowances.filter(a => a.amount > 0);
-                localStorage.setItem('ot_settings_v3', JSON.stringify(appSettings));
-            }
-            
-            if (appSettings.ssoMax === undefined) appSettings.ssoMax = 750;
-            if (appSettings.empType === undefined) appSettings.empType = 'daily';
+        <main>
+            <div id="homeTab" class="tab-content active">
+                <section class="budget-card">
+                    <div class="budget-header">
+                        <span id="budgetPeriodLabel">Budget မသတ်မှတ်ရသေးပါ</span>
+                        <span class="days-badge" id="remainingDaysBadge">-</span>
+                    </div>
+                    <div class="budget-summary">
+                        <div class="summary-item"><span>Budget</span><strong id="homeBudget">0</strong></div>
+                        <div class="summary-item"><span>အသုံးစရိတ်</span><strong id="homeExpense">0</strong></div>
+                        <div class="summary-item"><span>လက်ကျန်ငွေ</span><strong id="homeBalance">0</strong></div>
+                    </div>
+                </section>
 
-            loadSettings();
-            applyTheme();
-            applyLanguage();
-            renderSettingsAllowancesList();
-            renderRecords();
-            initSwipeNavigation();
-        };
+                <section class="section-box">
+                    <div class="section-title">စာရင်းသွင်းရန်</div>
+                    <div class="input-group">
+                        <input type="text" id="descInput" placeholder="ဘာဝယ်လိုက်လဲ?">
+                        <input type="number" id="amountInput" placeholder="ဘယ်လောက်ကျလဲ? (Ks)">
+                        <input type="hidden" id="editId">
+                        <button onclick="addOrUpdateExpense()" class="btn-primary" id="submitBtn">စာရင်းသွင်းမယ်</button>
+                    </div>
+                </section>
 
-        // UI Event Listeners for Top Menu
-        function toggleTopMenu(event) {
-            const menu = document.getElementById('top-dropdown');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-            event.stopPropagation();
-        }
+                <ul id="homeExpenseList" class="expense-list"></ul>
+            </div>
 
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('top-dropdown');
-            const icon = document.querySelector('.fa-ellipsis-vertical');
-            if (menu.style.display === 'block' && event.target !== icon && !menu.contains(event.target)) {
-                menu.style.display = 'none';
-            }
-        });
+            <div id="historyTab" class="tab-content">
+                <section class="section-box">
+                    <div class="input-group">
+                        <label>ရက်စွဲအတိအကျဖြင့် မှတ်တမ်းကြည့်ရန်</label>
+                        <input type="date" id="historyDatePicker" onchange="renderHistory()">
+                    </div>
+                </section>
+                <ul id="historyExpenseList" class="expense-list"></ul>
+            </div>
 
-        function openHelpModal() {
-            document.getElementById('top-dropdown').style.display = 'none';
-            document.getElementById('help-modal').classList.add('active');
-        }
-
-        function closeHelpModal() {
-            document.getElementById('help-modal').classList.remove('active');
-        }
-
-        function initSwipeNavigation() {
-            let touchStartX = 0;
-            let touchEndX = 0;
-            let isFolderSwipe = false;
-            const mainEl = document.getElementById('main-content');
-
-            mainEl.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-                isFolderSwipe = !!e.target.closest('.folder-card') || !!e.target.closest('input');
-            }, { passive: true });
-
-            mainEl.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleTabSwipe(isFolderSwipe);
-            }, { passive: true });
-
-            function handleTabSwipe(ignoreSwipe) {
-                if (ignoreSwipe) return; 
-                const threshold = 80; 
-                const deltaX = touchEndX - touchStartX;
-
-                if (document.getElementById('history-detail').style.display === 'block') return;
-
-                if (deltaX < -threshold) {
-                    if (currentTabIndex < tabOrder.length - 1) {
-                        currentTabIndex++;
-                        triggerTabChange(currentTabIndex);
-                    }
-                } else if (deltaX > threshold) {
-                    if (currentTabIndex > 0) {
-                        currentTabIndex--;
-                        triggerTabChange(currentTabIndex);
-                    }
-                }
-            }
-        }
-
-        function triggerTabChange(index) {
-            const tabId = tabOrder[index];
-            const navElement = document.getElementById(`nav-${tabId}`);
-            switchTab(tabId, navElement);
-        }
-
-        function switchTab(tabId, element) {
-            currentTabIndex = tabOrder.indexOf(tabId);
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            element.classList.add('active');
-            document.getElementById('page-title').innerText = element.querySelector('span').innerText.trim();
-            if(tabId === 'history') { hideHistoryDetail(); renderHistoryFolders(); }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function initFolderSwipe() {
-            const folders = document.querySelectorAll('.folder-card');
-            folders.forEach(folder => {
-                let startX = 0;
-                folder.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
-                folder.addEventListener('touchmove', e => {
-                    let currentX = e.touches[0].clientX;
-                    let diff = currentX - startX;
-                    if(diff < -30) { 
-                        folders.forEach(f => f.style.transform = 'translateX(0)'); 
-                        folder.style.transform = `translateX(-80px)`;
-                    } else if (diff > 30) { 
-                        folder.style.transform = `translateX(0px)`;
-                    }
-                }, {passive: true});
-            });
-        }
-
-        function handleFolderClick(event, cycleName, element) {
-            if (element.style.transform === 'translateX(-80px)') {
-                element.style.transform = 'translateX(0px)';
-                return;
-            }
-            showHistoryDetail(cycleName);
-        }
-
-        function confirmDeleteFolder(cycleName) {
-            cycleToDelete = cycleName;
-            document.getElementById('delete-folder-modal').classList.add('active');
-        }
-
-        function closeDeleteFolderModal() {
-            cycleToDelete = null;
-            document.getElementById('delete-folder-modal').classList.remove('active');
-        }
-
-        function proceedDeleteFolder() {
-            if (cycleToDelete !== null) {
-                appRecords = appRecords.filter(r => getPayrollCycleString(r.date) !== cycleToDelete);
-                localStorage.setItem('ot_records_v4', JSON.stringify(appRecords));
-                renderRecords();
-                renderHistoryFolders();
-                closeDeleteFolderModal();
-            }
-        }
-
-        function changeLanguage() {
-            appSettings.language = document.getElementById('app-language').value;
-            localStorage.setItem('ot_settings_v3', JSON.stringify(appSettings));
-            applyLanguage();
-            if(document.getElementById('tab-history').classList.contains('active')) renderHistoryFolders(); 
-            
-            if (document.getElementById('calc-summary-container').style.display === 'block') {
-                calculateManual();
-            }
-        }
-
-        function applyLanguage() {
-            const lang = appSettings.language || 'en';
-            document.getElementById('app-language').value = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[lang] && i18n[lang][key]) el.innerText = i18n[lang][key];
-            });
-            const activeTab = document.querySelector('.nav-item.active').querySelector('span').innerText.trim();
-            document.getElementById('page-title').innerText = activeTab;
-            
-            document.getElementById('help-content').innerHTML = i18n[lang].helpContent;
-            
-            toggleEmpType(); 
-            renderSettingsAllowancesList();
-            
-            const placeholdersName = lang === 'mm' ? "အမည်" : "Name";
-            const placeholdersAmt = lang === 'mm' ? "ပမာဏ" : "Amount";
-            document.querySelectorAll('.custom-allow-row input[type="text"]').forEach(el => el.placeholder = placeholdersName);
-            document.querySelectorAll('.custom-allow-row input[type="number"]').forEach(el => el.placeholder = placeholdersAmt);
-        }
-
-        function toggleTheme() {
-            appSettings.isDarkMode = !appSettings.isDarkMode;
-            localStorage.setItem('ot_settings_v3', JSON.stringify(appSettings));
-            applyTheme();
-        }
-        function applyTheme() {
-            if (appSettings.isDarkMode) document.body.classList.add('dark-mode');
-            else document.body.classList.remove('dark-mode');
-        }
-
-        function loadSettings() {
-            document.getElementById('set-emp-type').value = appSettings.empType;
-            document.getElementById('set-wage').value = appSettings.wage;
-            document.getElementById('set-ot15').value = appSettings.ot15;
-            document.getElementById('set-ot20').value = appSettings.ot20;
-            document.getElementById('set-ot30').value = appSettings.ot30;
-            document.getElementById('set-night').value = appSettings.night;
-            document.getElementById('set-meal').value = appSettings.meal;
-            document.getElementById('set-start').value = appSettings.startDay;
-            document.getElementById('set-end').value = appSettings.endDay;
-            document.getElementById('set-sso').value = appSettings.ssoPercent !== undefined ? appSettings.ssoPercent : 5;
-            document.getElementById('set-sso-max').value = appSettings.ssoMax !== undefined ? appSettings.ssoMax : 750;
-            toggleEmpType();
-        }
-
-        function toggleEmpType() {
-            const empType = document.getElementById('set-emp-type').value;
-            const lang = appSettings.language || 'en';
-            if (empType === 'monthly') {
-                document.getElementById('lbl-wage').innerText = i18n[lang].monthlySalary;
-            } else {
-                document.getElementById('lbl-wage').innerText = i18n[lang].dailyWage;
-            }
-            autoCalculateRates();
-        }
-
-        function autoCalculateRates() {
-            const wage = Number(document.getElementById('set-wage').value) || 0;
-            const empType = document.getElementById('set-emp-type').value;
-            
-            const hourly = empType === 'monthly' ? (wage / 30) / 8 : (wage / 8);
-            
-            document.getElementById('set-ot15').value = +(hourly * 1.5).toFixed(2);
-            document.getElementById('set-ot20').value = +(hourly * 2).toFixed(2);
-            document.getElementById('set-ot30').value = +(hourly * 3).toFixed(2);
-        }
-
-        function saveSettings() {
-            let updatedExtra = [];
-            document.querySelectorAll('#set-extra-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value;
-                const amt = Math.abs(Number(row.children[1].value));
-                if(name && amt > 0) updatedExtra.push({ name: name, amount: amt });
-            });
-
-            let updatedExp = [];
-            document.querySelectorAll('#set-expense-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value;
-                const amt = Math.abs(Number(row.children[1].value));
-                if(name && amt > 0) updatedExp.push({ name: name, amount: amt });
-            });
-
-            appSettings = {
-                ...appSettings,
-                empType: document.getElementById('set-emp-type').value,
-                wage: Number(document.getElementById('set-wage').value),
-                ot15: Number(document.getElementById('set-ot15').value),
-                ot20: Number(document.getElementById('set-ot20').value),
-                ot30: Number(document.getElementById('set-ot30').value),
-                night: Number(document.getElementById('set-night').value),
-                meal: Number(document.getElementById('set-meal').value),
-                startDay: Number(document.getElementById('set-start').value),
-                endDay: Number(document.getElementById('set-end').value),
-                ssoPercent: Number(document.getElementById('set-sso').value),
-                ssoMax: Number(document.getElementById('set-sso-max').value),
-                customAllowances: updatedExtra,
-                customExpenses: updatedExp
-            };
-            localStorage.setItem('ot_settings_v3', JSON.stringify(appSettings));
-            renderSettingsAllowancesList(); 
-            const msg = appSettings.language === 'mm' ? "ဆက်တင်များ သိမ်းဆည်းပြီးပါပြီ။" : "Settings saved successfully!";
-            alert(msg);
-        }
-
-        function renderSettingsAllowancesList() {
-            document.getElementById('set-extra-container').innerHTML = '';
-            document.getElementById('set-expense-container').innerHTML = '';
-            
-            if(appSettings.customAllowances) {
-                appSettings.customAllowances.forEach(item => addDynamicRow('set-extra', item.name, item.amount));
-            }
-            if(appSettings.customExpenses) {
-                appSettings.customExpenses.forEach(item => addDynamicRow('set-expense', item.name, item.amount));
-            }
-        }
-
-        function addDynamicRow(containerPrefix, name='', amount='') {
-            const container = document.getElementById(containerPrefix + '-container');
-            const isExpense = containerPrefix.includes('expense');
-            
-            const row = document.createElement('div');
-            row.className = 'custom-allow-row';
-            const lang = appSettings.language || 'en';
-            const placeholderName = lang === 'mm' ? "အမည်" : "Name";
-            const placeholderAmt = lang === 'mm' ? "ပမာဏ" : "Amount";
-            
-            const colorClass = isExpense ? 'var(--danger-red)' : 'var(--success-green)';
-            
-            row.innerHTML = `
-                <input type="text" value="${name}" placeholder="${placeholderName}" style="flex: 2;">
-                <input type="number" value="${amount}" placeholder="${placeholderAmt}" style="flex: 1.2; text-align: center; color: ${colorClass}; font-weight: bold;">
-                <button class="custom-allow-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-circle-minus"></i></button>
-            `;
-            container.appendChild(row);
-        }
-
-        function saveRecord() {
-            const idInput = document.getElementById('edit-id').value;
-            const dateVal = document.getElementById('rec-date').value;
-            if(!dateVal) return;
-            
-            let recExtras = [];
-            document.querySelectorAll('#rec-extra-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value;
-                const amt = Math.abs(Number(row.children[1].value));
-                if(name && amt > 0) recExtras.push({name, amount: amt});
-            });
-
-            let recExpenses = [];
-            document.querySelectorAll('#rec-expense-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value;
-                const amt = Math.abs(Number(row.children[1].value));
-                if(name && amt > 0) recExpenses.push({name, amount: amt});
-            });
-
-            const record = {
-                id: idInput ? Number(idInput) : Date.now(),
-                date: dateVal,
-                timeStr: `${document.getElementById('rec-in').value} - ${document.getElementById('rec-out').value}`,
-                day: Number(document.getElementById('rec-day').value),
-                ot15: Number(document.getElementById('rec-ot15').value),
-                ot20: Number(document.getElementById('rec-ot20').value),
-                ot30: Number(document.getElementById('rec-ot30').value),
-                night: document.getElementById('rec-night').checked ? 1 : 0,
-                meal: document.getElementById('rec-meal').checked ? 1 : 0,
-                fixedPay: 0,
-                advancePay: 0,
-                extraPlus: recExtras,
-                extraMinus: recExpenses
-            };
-
-            if (idInput) {
-                const index = appRecords.findIndex(r => r.id === record.id);
-                if(index !== -1) appRecords[index] = record;
-                cancelEdit();
-            } else {
-                appRecords.unshift(record);
-            }
-
-            appRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
-            localStorage.setItem('ot_records_v4', JSON.stringify(appRecords));
-            
-            document.getElementById('rec-ot15').value = 0;
-            document.getElementById('rec-ot20').value = 0;
-            document.getElementById('rec-ot30').value = 0;
-            document.getElementById('rec-night').checked = false;
-            document.getElementById('rec-meal').checked = false;
-            document.getElementById('rec-extra-container').innerHTML = '';
-            document.getElementById('rec-expense-container').innerHTML = '';
-            renderRecords();
-        }
-
-        function editRecord(id) {
-            const rec = appRecords.find(r => r.id === id);
-            if(!rec) return;
-
-            document.getElementById('edit-id').value = rec.id;
-            document.getElementById('rec-date').value = rec.date;
-            
-            const times = rec.timeStr.split(" - ");
-            if(times.length === 2) {
-                document.getElementById('rec-in').value = times[0];
-                document.getElementById('rec-out').value = times[1];
-            }
-            
-            document.getElementById('rec-day').value = rec.day;
-            document.getElementById('rec-ot15').value = rec.ot15;
-            document.getElementById('rec-ot20').value = rec.ot20;
-            document.getElementById('rec-ot30').value = rec.ot30;
-            document.getElementById('rec-night').checked = rec.night === 1;
-            document.getElementById('rec-meal').checked = rec.meal === 1;
-            
-            document.getElementById('rec-extra-container').innerHTML = '';
-            document.getElementById('rec-expense-container').innerHTML = '';
-            
-            // Handle legacy records
-            if(rec.fixedPay > 0) addDynamicRow('rec-extra', appSettings.language === 'mm' ? 'အပိုရငွေ' : 'Fixed/Extra', rec.fixedPay);
-            if(rec.advancePay > 0) addDynamicRow('rec-expense', appSettings.language === 'mm' ? 'ကြိုတင်ငွေ' : 'Advance', rec.advancePay);
-            
-            if(rec.extraEntries) {
-                rec.extraEntries.forEach(e => {
-                    if(e.amount > 0) addDynamicRow('rec-extra', e.name, Math.abs(e.amount));
-                    else addDynamicRow('rec-expense', e.name, Math.abs(e.amount));
-                });
-            }
-            
-            // Current structure
-            if(rec.extraPlus) rec.extraPlus.forEach(e => addDynamicRow('rec-extra', e.name, e.amount));
-            if(rec.extraMinus) rec.extraMinus.forEach(e => addDynamicRow('rec-expense', e.name, e.amount));
-
-            const btn = document.getElementById('btn-save-record');
-            btn.innerText = appSettings.language === 'mm' ? "ပြင်ဆင်မည်" : "Update Record";
-            btn.classList.replace('btn-primary', 'btn-warning');
-            document.getElementById('btn-cancel-edit').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function cancelEdit() {
-            document.getElementById('edit-id').value = '';
-            const btn = document.getElementById('btn-save-record');
-            btn.innerText = appSettings.language === 'mm' ? "မှတ်တမ်းထည့်မည်" : "Add Record";
-            btn.classList.replace('btn-warning', 'btn-primary');
-            document.getElementById('btn-cancel-edit').style.display = 'none';
-            document.getElementById('rec-extra-container').innerHTML = '';
-            document.getElementById('rec-expense-container').innerHTML = '';
-        }
-
-        function deleteRecord(id) {
-            recordToDeleteId = id;
-            document.getElementById('delete-modal').classList.add('active');
-        }
-
-        function closeDeleteModal() {
-            recordToDeleteId = null;
-            document.getElementById('delete-modal').classList.remove('active');
-        }
-
-        function confirmDelete() {
-            if (recordToDeleteId !== null) {
-                appRecords = appRecords.filter(r => r.id !== recordToDeleteId);
-                localStorage.setItem('ot_records_v4', JSON.stringify(appRecords));
-                renderRecords();
-                if(document.getElementById('tab-history').classList.contains('active')) renderHistoryFolders();
-                closeDeleteModal();
-            }
-        }
-
-        function renderRecords() {
-            const tbody = document.getElementById('records-table-body');
-            tbody.innerHTML = '';
-            const displayRecords = appRecords.slice(0, 15);
-            displayRecords.forEach(rec => {
-                const d = new Date(rec.date);
-                const dateStr = `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
-                
-                const nightIcon = rec.night ? `<i class="fa-solid fa-moon" style="color: var(--primary-blue); margin-right: 4px;" title="Night Shift"></i>` : '';
-                const mealIcon = rec.meal ? `<i class="fa-solid fa-utensils" style="color: var(--warning-yellow);" title="Meal Allowance"></i>` : '';
-                
-                let totPlus = rec.fixedPay || 0;
-                let totMinus = rec.advancePay || 0;
-                
-                if(rec.extraEntries) {
-                    rec.extraEntries.forEach(e => {
-                        if(e.amount > 0) totPlus += e.amount;
-                        else totMinus += Math.abs(e.amount);
-                    });
-                }
-                if(rec.extraPlus) rec.extraPlus.forEach(e => totPlus += e.amount);
-                if(rec.extraMinus) rec.extraMinus.forEach(e => totMinus += e.amount);
-                
-                const fixedBadge = totPlus > 0 ? `<br><span style="color: var(--success-green); font-size: 0.75rem; font-weight: bold;">+${totPlus}</span>` : '';
-                const advanceBadge = totMinus > 0 ? `<br><span style="color: var(--danger-red); font-size: 0.75rem; font-weight: bold;">-${totMinus}</span>` : '';
-                const extras = (rec.night || rec.meal) ? `<div style="margin-top: 4px; font-size: 0.8rem;">${nightIcon}${mealIcon}</div>` : '';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="text-align: left; font-weight: 600;">${dateStr}</td>
-                        <td style="color: var(--text-muted); font-size:0.75rem; vertical-align: middle;">
-                            ${rec.timeStr}
-                            ${extras}
-                            ${fixedBadge}
-                            ${advanceBadge}
-                        </td>
-                        <td class="text-blue">${rec.day}</td>
-                        <td>${rec.ot15 || '-'}</td><td>${rec.ot20 || '-'}</td><td>${rec.ot30 || '-'}</td>
-                        <td class="action-icons">
-                            <i class="fa-solid fa-pen icon-edit" onclick="editRecord(${rec.id})"></i>
-                            <i class="fa-solid fa-trash icon-delete" onclick="deleteRecord(${rec.id})"></i>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function getPayrollCycleString(dateStr) {
-            const d = new Date(dateStr);
-            const rDate = d.getDate();
-            const rMonth = d.getMonth();
-            const rYear = d.getFullYear();
-
-            const sDay = appSettings.startDay;
-            const eDay = appSettings.endDay;
-            let sMonth, eMonth, sYear = rYear, eYear = rYear;
-
-            if (sDay > eDay) {
-                if (rDate >= sDay) {
-                    sMonth = rMonth; eMonth = rMonth + 1;
-                    if (eMonth > 11) { eMonth = 0; eYear++; }
-                } else {
-                    sMonth = rMonth - 1; eMonth = rMonth;
-                    if (sMonth < 0) { sMonth = 11; sYear--; }
-                }
-            } else {
-                sMonth = rMonth; eMonth = rMonth;
-            }
-
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            if (sYear !== eYear) {
-                return `${sDay} ${monthNames[sMonth]} ${sYear} - ${eDay} ${monthNames[eMonth]} ${eYear}`;
-            }
-            return `${sDay} ${monthNames[sMonth]} - ${eDay} ${monthNames[eMonth]} ${eYear}`;
-        }
-
-        function renderHistoryFolders() {
-            const container = document.getElementById('folder-container');
-            container.innerHTML = '';
-            if(appRecords.length === 0) return;
-
-            const groups = {};
-            appRecords.forEach(rec => {
-                const cycleName = getPayrollCycleString(rec.date);
-                if(!groups[cycleName]) groups[cycleName] = [];
-                groups[cycleName].push(rec);
-            });
-
-            for(const [cycleName, records] of Object.entries(groups)) {
-                container.innerHTML += `
-                    <div class="folder-wrapper">
-                        <div class="folder-delete-bg" onclick="confirmDeleteFolder('${cycleName}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </div>
-                        <div class="card folder-card" onclick="handleFolderClick(event, '${cycleName}', this)">
-                            <div class="folder-info">
-                                <i class="fa-solid fa-folder" style="color: var(--primary-blue); font-size: 2.2rem;"></i>
-                                <div>
-                                    <div style="font-weight: 700; font-size: 1rem; color: var(--text-main);">${cycleName}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 3px;">${records.length} ENTRIES</div>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right" style="color: var(--border-color); font-size: 1.2rem;"></i>
+            <div id="settingsTab" class="tab-content">
+                <section class="section-box">
+                    <div class="user-profile">
+                        <img id="userAvatar" src="" alt="User">
+                        <div class="user-profile-info">
+                            <span class="user-profile-name" id="userName">User Name</span>
+                            <span class="user-profile-email" id="userEmail">user@gmail.com</span>
                         </div>
                     </div>
-                `;
-            }
+                </section>
+
+                <section class="section-box">
+                    <div class="section-title">Budget သတ်မှတ်ရန်</div>
+                    <div class="input-group">
+                        <div class="input-row">
+                            <div><label>စတင်မည့်ရက်</label><input type="date" id="settingStartDate"></div>
+                            <div><label>နောက်ဆုံးရက်</label><input type="date" id="settingEndDate"></div>
+                        </div>
+                        <label>ပမာဏ (Ks)</label>
+                        <input type="number" id="settingBudgetInput" placeholder="Budget စုစုပေါင်းပမာဏ">
+                        <button onclick="saveBudget()" class="btn-primary">Save Budget</button>
+                    </div>
+                </section>
+
+                <section class="section-box" style="background: transparent; box-shadow: none; padding: 0;">
+                    <button onclick="logOut()" class="btn-danger-outline">အကောင့်မှ ထွက်မည် (Logout)</button>
+                </section>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home')">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Home</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('history')">
+                <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span>History</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('settings')">
+                <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>Settings</span>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<script type="module">
+    // 1. Import Firebase Auth & Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyASXYsE3dghAjBk8uYcPUzgN635_kDNjNs",
+        authDomain: "budget-app-245ad.firebaseapp.com",
+        projectId: "budget-app-245ad",
+        storageBucket: "budget-app-245ad.firebasestorage.app",
+        messagingSenderId: "956361856331",
+        appId: "1:956361856331:web:8aca8afc262c83a2aac4ce",
+        measurementId: "G-H5SGBF0CG5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // Global Variables
+    window.currentUser = null;
+    window.appData = { currentBudget: { startDate: '', endDate: '', amount: 0 }, expenses: [] };
+
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    const loadingScreen = document.getElementById('loadingScreen');
+
+    // 2. Authentication State Listener
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentUser = user;
+            loginScreen.style.display = 'none';
+            loadingScreen.style.display = 'flex'; // Show loading while fetching DB
+
+            document.getElementById('userName').innerText = user.displayName;
+            document.getElementById('userEmail').innerText = user.email;
+            document.getElementById('userAvatar').src = user.photoURL;
             
-            initFolderSwipe();
+            // Fetch Data From Firestore
+            const docRef = doc(db, "users", user.uid);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    window.appData = docSnap.data();
+                } else {
+                    window.appData = { currentBudget: { startDate: '', endDate: '', amount: 0 }, expenses: [] };
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+
+            loadingScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            window.initApp(); 
+        } else {
+            window.currentUser = null;
+            loginScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+            loadingScreen.style.display = 'none';
         }
+    });
 
-        function showHistoryDetail(cycleName) {
-            document.getElementById('history-list').style.display = 'none';
-            document.getElementById('history-detail').style.display = 'block';
-            document.getElementById('detail-month-title').innerText = cycleName;
-            
-            const cycleRecords = appRecords.filter(r => getPayrollCycleString(r.date) === cycleName);
-            cycleRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
-            renderHistoryDetailTable(cycleRecords);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 3. Save to Firestore
+    window.saveDataToFirestore = async () => {
+        if (!window.currentUser) return;
+        try {
+            await setDoc(doc(db, "users", window.currentUser.uid), window.appData);
+        } catch (error) {
+            alert("စာရင်းသိမ်းဆည်းရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။: " + error.message);
         }
+    };
 
-        function hideHistoryDetail() {
-            document.getElementById('history-list').style.display = 'block';
-            document.getElementById('history-detail').style.display = 'none';
+    // 4. Global Functions for UI
+    window.signInWithGoogle = () => { signInWithPopup(auth, provider).catch(error => alert("Error: " + error.message)); };
+    window.logOut = () => { signOut(auth).then(() => { window.switchTab('home'); }); };
+
+    window.getCurrentDateKey = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; };
+    
+    window.getAutoDateTime = () => { const now = new Date(); return { fullStr: now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }), timeStr: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }; };
+
+    window.initApp = () => {
+        const today = window.getCurrentDateKey();
+        document.getElementById('historyDatePicker').value = today;
+        if(window.appData.currentBudget && window.appData.currentBudget.startDate) {
+            document.getElementById('settingStartDate').value = window.appData.currentBudget.startDate;
+            document.getElementById('settingEndDate').value = window.appData.currentBudget.endDate;
+            document.getElementById('settingBudgetInput').value = window.appData.currentBudget.amount;
+        } else {
+            document.getElementById('settingStartDate').value = today;
+            document.getElementById('settingEndDate').value = today;
+            window.appData.currentBudget = { startDate: '', endDate: '', amount: 0 }; 
         }
+        window.renderHome();
+    };
 
-        function showDailyDetail(id) {
-            const rec = appRecords.find(r => r.id === id);
-            if (!rec) return;
+    window.switchTab = (tabName) => {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        
+        let headerTitle = "Home";
+        if(tabName === 'home') { document.querySelectorAll('.nav-item')[0].classList.add('active'); window.renderHome(); }
+        else if (tabName === 'history') { document.querySelectorAll('.nav-item')[1].classList.add('active'); headerTitle = "History"; window.renderHistory(); }
+        else if (tabName === 'settings') { document.querySelectorAll('.nav-item')[2].classList.add('active'); headerTitle = "Settings"; }
+        document.getElementById('headerTitle').innerText = headerTitle; window.scrollTo({ top: 0 });
+    };
 
-            const d = new Date(rec.date);
-            const dateStr = `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}, ${d.getFullYear()}`;
-            document.getElementById('daily-detail-title').innerText = dateStr;
+    window.saveBudget = () => {
+        const start = document.getElementById('settingStartDate').value;
+        const end = document.getElementById('settingEndDate').value;
+        const amount = parseFloat(document.getElementById('settingBudgetInput').value);
+        if (!start || !end || new Date(start) > new Date(end) || isNaN(amount) || amount <= 0) { alert("အချက်အလက်များကို မှန်ကန်စွာ ထည့်ပါ။"); return; }
+        window.appData.currentBudget = { startDate: start, endDate: end, amount: amount };
+        window.saveDataToFirestore().then(() => { alert("Budget သတ်မှတ်ပြီးပါပြီ။"); window.renderHome(); });
+    };
 
-            let html = '';
-            const lang = appSettings.language || 'en';
+    window.addOrUpdateExpense = () => {
+        const desc = document.getElementById('descInput').value;
+        const amount = parseFloat(document.getElementById('amountInput').value);
+        const editId = document.getElementById('editId').value;
+        const autoDT = window.getAutoDateTime(); const dateKey = window.getCurrentDateKey();
 
-            let dailyBase = 0;
-            if (appSettings.empType !== 'monthly') {
-                dailyBase = (rec.ot20 === 0 && rec.ot30 === 0) ? (rec.day * appSettings.wage) : 0;
-            }
-            
-            let ot15Pay = (rec.ot15 || 0) * appSettings.ot15;
-            let ot20Pay = (rec.ot20 || 0) * appSettings.ot20;
-            let ot30Pay = (rec.ot30 || 0) * appSettings.ot30;
-            let nightPay = (rec.night ? 1 : 0) * appSettings.night;
-            let mealPay = (rec.meal ? 1 : 0) * appSettings.meal;
-            
-            let total = dailyBase + ot15Pay + ot20Pay + ot30Pay + nightPay + mealPay;
+        if (desc.trim() === '' || isNaN(amount) || amount <= 0) { alert('အချက်အလက်များကို ပြည့်စုံမှန်ကန်စွာ ထည့်ပါ။'); return; }
 
-            if (dailyBase > 0) html += `<div class="summary-row"><span>${i18n[lang].basicPay} <span style="font-size:0.7rem;">(${rec.day}x)</span></span> <strong>${dailyBase.toLocaleString()}</strong></div>`;
-            if (ot15Pay > 0) html += `<div class="summary-row"><span>OT 1.5 <span style="font-size:0.7rem;">(${rec.ot15}h)</span></span> <strong>${ot15Pay.toLocaleString()}</strong></div>`;
-            if (ot20Pay > 0) html += `<div class="summary-row"><span>OT 2.0 <span style="font-size:0.7rem;">(${rec.ot20}h)</span></span> <strong>${ot20Pay.toLocaleString()}</strong></div>`;
-            if (ot30Pay > 0) html += `<div class="summary-row"><span>OT 3.0 <span style="font-size:0.7rem;">(${rec.ot30}h)</span></span> <strong>${ot30Pay.toLocaleString()}</strong></div>`;
-            if (nightPay > 0) html += `<div class="summary-row"><span>${i18n[lang].nightAllow}</span> <strong>${nightPay.toLocaleString()}</strong></div>`;
-            if (mealPay > 0) html += `<div class="summary-row"><span>${i18n[lang].mealAllow}</span> <strong>${mealPay.toLocaleString()}</strong></div>`;
+        if(!window.appData.expenses) window.appData.expenses = [];
 
-            if (rec.fixedPay > 0) {
-                total += rec.fixedPay;
-                html += `<div class="summary-row"><span>${lang === 'mm' ? 'အပြတ်လုပ်ခ / အပိုရငွေ' : 'Fixed / Extra Pay'}</span> <strong style="color: var(--success-green);">+ ${rec.fixedPay.toLocaleString()}</strong></div>`;
-            }
-            if (rec.advancePay > 0) {
-                total -= rec.advancePay;
-                html += `<div class="summary-row"><span>${i18n[lang].advancePayTitle}</span> <strong style="color: var(--danger-red);">- ${rec.advancePay.toLocaleString()}</strong></div>`;
-            }
-
-            if (rec.extraEntries) {
-                rec.extraEntries.forEach(e => {
-                    if(e.amount > 0) {
-                        total += e.amount;
-                        html += `<div class="summary-row"><span>${e.name}</span> <strong style="color: var(--success-green);">+ ${e.amount.toLocaleString()}</strong></div>`;
-                    } else {
-                        let absAmt = Math.abs(e.amount);
-                        total -= absAmt;
-                        html += `<div class="summary-row"><span>${e.name}</span> <strong style="color: var(--danger-red);">- ${absAmt.toLocaleString()}</strong></div>`;
-                    }
-                });
-            }
-            if (rec.extraPlus) {
-                rec.extraPlus.forEach(e => {
-                    total += e.amount;
-                    html += `<div class="summary-row"><span>${e.name}</span> <strong style="color: var(--success-green);">+ ${e.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-            if (rec.extraMinus) {
-                rec.extraMinus.forEach(e => {
-                    total -= e.amount;
-                    html += `<div class="summary-row"><span>${e.name}</span> <strong style="color: var(--danger-red);">- ${e.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-
-            html += `<div class="summary-total" style="margin-top: 10px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                        <span style="color: var(--text-main);">${i18n[lang].dailyTotal}</span> 
-                        <span style="color: var(--primary-blue); font-size: 1.4rem;">${total.toLocaleString(undefined, {minimumFractionDigits: 0})}</span>
-                     </div>`;
-
-            document.getElementById('daily-detail-content').innerHTML = html;
-            document.getElementById('daily-detail-modal').classList.add('active');
+        if (editId) {
+            window.appData.expenses = window.appData.expenses.map(exp => { if (exp.id == editId) return { ...exp, desc: desc, amount: amount }; return exp; });
+            document.getElementById('submitBtn').innerText = 'စာရင်းသွင်းမယ်'; document.getElementById('editId').value = '';
+        } else {
+            window.appData.expenses.unshift({ id: Date.now(), desc: desc, amount: amount, fullDateStr: autoDT.fullStr, timeStr: autoDT.timeStr, dateKey: dateKey });
         }
+        document.getElementById('descInput').value = ''; document.getElementById('amountInput').value = '';
+        
+        window.renderHome();
+        window.saveDataToFirestore(); // Save to DB in background
+    };
 
-        function closeDailyDetailModal() {
-            document.getElementById('daily-detail-modal').classList.remove('active');
+    window.editExpense = (id) => {
+        const exp = window.appData.expenses.find(e => e.id === id);
+        if(exp) { document.getElementById('descInput').value = exp.desc; document.getElementById('amountInput').value = exp.amount; document.getElementById('editId').value = exp.id; document.getElementById('submitBtn').innerText = 'ပြင်မယ်'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    };
+
+    window.deleteExpense = (id) => {
+        if(confirm('ဖျက်မှာ သေချာပြီလား?')) { 
+            window.appData.expenses = window.appData.expenses.filter(e => e.id !== id); 
+            window.renderHome(); window.renderHistory();
+            window.saveDataToFirestore();
         }
+    };
 
-        function renderHistoryDetailTable(records) {
-            let totalRegDays = 0, totalOt15 = 0, totalOt20 = 0, totalOt30 = 0, totalNight = 0, totalMeal = 0;
-            
-            let combinedExtras = {}; 
-            let combinedExpenses = {};
-            
-            let fallbackFixed = 0, fallbackAdvance = 0; 
-            let fallbackFixedCount = 0, fallbackAdvanceCount = 0;
+    window.renderHome = () => {
+        const budget = window.appData.currentBudget; const listEl = document.getElementById('homeExpenseList'); listEl.innerHTML = '';
+        if (!budget || !budget.startDate) { document.getElementById('budgetPeriodLabel').innerText = "Budget မသတ်မှတ်ရသေးပါ"; document.getElementById('remainingDaysBadge').innerText = "-"; document.getElementById('homeBudget').innerText = "0"; document.getElementById('homeExpense').innerText = "0"; document.getElementById('homeBalance').innerText = "0"; return; }
+        
+        document.getElementById('budgetPeriodLabel').innerText = `${budget.startDate} မှ ${budget.endDate} ထိ`;
+        const end = new Date(budget.endDate).setHours(23, 59, 59, 999); const today = new Date().setHours(0, 0, 0, 0);
+        const remDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+        const badge = document.getElementById('remainingDaysBadge');
+        if (remDays < 0) { badge.innerText = "ရက်ကျော်လွန်သွားပါပြီ"; badge.style.background = "var(--tg-red)"; } else { badge.innerText = `ကျန်ရက်: ${remDays}`; badge.style.background = "var(--tg-green)"; }
 
-            const tbody = document.getElementById('history-detail-table');
-            tbody.innerHTML = '';
+        let totalExpense = 0; const startObj = new Date(budget.startDate).setHours(0,0,0,0);
+        const periodExpenses = (window.appData.expenses || []).filter(exp => { const expDate = new Date(exp.dateKey).getTime(); return expDate >= startObj && expDate <= end; });
 
-            records.forEach(rec => {
-                const d = new Date(rec.date);
-                const formattedDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-                
-                const nightIcon = rec.night ? `<i class="fa-solid fa-moon" style="color: var(--primary-blue); font-size: 0.65rem; margin-left: 5px;"></i>` : '';
-                const mealIcon = rec.meal ? `<i class="fa-solid fa-utensils" style="color: var(--warning-yellow); font-size: 0.65rem; margin-left: 5px;"></i>` : '';
-                
-                let recTotalPlus = rec.fixedPay || 0;
-                let recTotalMinus = rec.advancePay || 0;
-                let recDynamicTotal = 0;
+        periodExpenses.forEach(exp => {
+            totalExpense += exp.amount;
+            listEl.innerHTML += `<li class="expense-item"><div class="expense-info"><span class="expense-desc">${exp.desc}</span><span class="expense-date">${exp.fullDateStr}</span><div class="action-btns"><button class="edit-btn" onclick="editExpense(${exp.id})">ပြင်မယ်</button><button class="delete-btn" onclick="deleteExpense(${exp.id})">ဖျက်မယ်</button></div></div><div class="right-side"><span class="expense-amount">- ${exp.amount.toLocaleString()} Ks</span></div></li>`;
+        });
+        document.getElementById('homeBudget').innerText = budget.amount.toLocaleString(); document.getElementById('homeExpense').innerText = totalExpense.toLocaleString(); document.getElementById('homeBalance').innerText = (budget.amount - totalExpense).toLocaleString();
+    };
 
-                if(rec.fixedPay > 0) {
-                    fallbackFixed += rec.fixedPay;
-                    fallbackFixedCount++;
-                }
-                if(rec.advancePay > 0) {
-                    fallbackAdvance += rec.advancePay;
-                    fallbackAdvanceCount++;
-                }
+    window.renderHistory = () => {
+        const selectedKey = document.getElementById('historyDatePicker').value;
+        const dayExpenses = (window.appData.expenses || []).filter(e => e.dateKey === selectedKey);
+        const listEl = document.getElementById('historyExpenseList'); listEl.innerHTML = '';
+        dayExpenses.forEach(exp => {
+            listEl.innerHTML += `<li class="expense-item"><div class="expense-info"><span class="expense-desc">${exp.desc}</span><span class="expense-date">${exp.timeStr}</span><div class="action-btns"><button class="delete-btn" onclick="deleteExpense(${exp.id})">ဖျက်မယ်</button></div></div><div class="right-side"><span class="expense-amount">- ${exp.amount.toLocaleString()} Ks</span></div></li>`;
+        });
+    };
+</script>
 
-                if(rec.extraEntries) {
-                    rec.extraEntries.forEach(e => {
-                        recDynamicTotal += e.amount;
-                        if(e.amount > 0) {
-                            recTotalPlus += e.amount;
-                            let key = e.name.trim();
-                            if(!combinedExtras[key]) combinedExtras[key] = {name: key, count: 0, total: 0};
-                            combinedExtras[key].count += 1;
-                            combinedExtras[key].total += e.amount;
-                        } else {
-                            let absAmt = Math.abs(e.amount);
-                            recTotalMinus += absAmt;
-                            let key = e.name.trim();
-                            if(!combinedExpenses[key]) combinedExpenses[key] = {name: key, count: 0, total: 0};
-                            combinedExpenses[key].count += 1;
-                            combinedExpenses[key].total += absAmt;
-                        }
-                    });
-                }
-                
-                if(rec.extraPlus) {
-                    rec.extraPlus.forEach(e => {
-                        recDynamicTotal += e.amount;
-                        recTotalPlus += e.amount;
-                        let key = e.name.trim();
-                        if(!combinedExtras[key]) combinedExtras[key] = {name: key, count: 0, total: 0};
-                        combinedExtras[key].count += 1;
-                        combinedExtras[key].total += e.amount;
-                    });
-                }
-                
-                if(rec.extraMinus) {
-                    rec.extraMinus.forEach(e => {
-                        recDynamicTotal -= e.amount;
-                        recTotalMinus += e.amount;
-                        let key = e.name.trim();
-                        if(!combinedExpenses[key]) combinedExpenses[key] = {name: key, count: 0, total: 0};
-                        combinedExpenses[key].count += 1;
-                        combinedExpenses[key].total += e.amount;
-                    });
-                }
-                
-                const fixedBadge = recTotalPlus > 0 ? `<span style="color: var(--success-green); font-size: 0.75rem; font-weight: bold; margin-left: 5px;">+${recTotalPlus}</span>` : '';
-                const advanceBadge = recTotalMinus > 0 ? `<span style="color: var(--danger-red); font-size: 0.75rem; font-weight: bold; margin-left: 5px;">-${recTotalMinus}</span>` : '';
-
-                let dailyBase = 0;
-                if (appSettings.empType !== 'monthly') {
-                    dailyBase = (rec.ot20 === 0 && rec.ot30 === 0) ? (rec.day * appSettings.wage) : 0;
-                }
-
-                let dailyTotal = dailyBase + 
-                                 ((rec.ot15 || 0) * appSettings.ot15) + 
-                                 ((rec.ot20 || 0) * appSettings.ot20) + 
-                                 ((rec.ot30 || 0) * appSettings.ot30) + 
-                                 ((rec.night ? 1 : 0) * appSettings.night) + 
-                                 ((rec.meal ? 1 : 0) * appSettings.meal) + 
-                                 (rec.fixedPay || 0) - 
-                                 (rec.advancePay || 0) + 
-                                 recDynamicTotal;
-
-                tbody.innerHTML += `
-                    <tr class="clickable-row" onclick="showDailyDetail(${rec.id})">
-                        <td style="text-align: left; font-weight: 600;">${formattedDate}</td>
-                        <td style="color: var(--text-muted); font-size:0.75rem; vertical-align: middle;">
-                            ${rec.timeStr}
-                            <div style="margin-top: 3px;">${nightIcon}${mealIcon}${fixedBadge}${advanceBadge}</div>
-                        </td>
-                        <td class="text-blue">${rec.day}</td>
-                        <td>${rec.ot15 || '-'}</td><td>${rec.ot20 || '-'}</td><td>${rec.ot30 || '-'}</td>
-                        <td style="text-align: right; color: var(--success-green); font-weight: bold; font-size: 0.85rem;">${dailyTotal.toLocaleString(undefined, {minimumFractionDigits: 0})}</td>
-                    </tr>
-                `;
-                
-                if (rec.ot20 === 0 && rec.ot30 === 0) totalRegDays += rec.day;
-                
-                totalOt15 += rec.ot15; totalOt20 += rec.ot20; totalOt30 += rec.ot30;
-                totalNight += rec.night; totalMeal += rec.meal;
-            });
-
-            const payOt15 = totalOt15 * appSettings.ot15;
-            const payOt20 = totalOt20 * appSettings.ot20;
-            const payOt30 = totalOt30 * appSettings.ot30;
-            const payNight = totalNight * appSettings.night;
-            const payMeal = totalMeal * appSettings.meal;
-            
-            let payBasic = 0;
-            if (appSettings.empType === 'monthly') {
-                payBasic = appSettings.wage;
-            } else {
-                payBasic = totalRegDays * appSettings.wage;
-            }
-
-            let ssoAmount = 0;
-            const ssoPercent = appSettings.ssoPercent || 0;
-            const ssoMax = appSettings.ssoMax !== undefined ? appSettings.ssoMax : 750;
-            if (ssoPercent > 0 && payBasic > 0) {
-                ssoAmount = payBasic * (ssoPercent / 100);
-                if (ssoMax > 0 && ssoAmount > ssoMax) {
-                    ssoAmount = ssoMax;
-                }
-            }
-            
-            let netTotal = payBasic + payOt15 + payOt20 + payOt30 + payNight + payMeal + fallbackFixed - fallbackAdvance - ssoAmount;
-            
-            let customHTML = '';
-            if(appSettings.customAllowances) {
-                appSettings.customAllowances.forEach(allow => {
-                    netTotal += allow.amount;
-                    customHTML += `<div class="summary-row"><span>${allow.name} <span style="font-size: 0.7rem; color: var(--text-muted);">(Fixed)</span></span> <strong style="color: var(--success-green);">+ ${allow.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-            if(appSettings.customExpenses) {
-                appSettings.customExpenses.forEach(exp => {
-                    netTotal -= exp.amount;
-                    customHTML += `<div class="summary-row"><span>${exp.name} <span style="font-size: 0.7rem; color: var(--text-muted);">(Fixed)</span></span> <strong style="color: var(--danger-red);">- ${exp.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-
-            const lang = appSettings.language;
-            let summaryHTML = '';
-
-            if (appSettings.empType === 'monthly') {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].monthlySalary}</span> <strong>${payBasic.toLocaleString()}</strong></div>`;
-            } else {
-                if (payBasic > 0 || totalRegDays > 0) {
-                    summaryHTML += `<div class="summary-row"><span>${i18n[lang].basicPay} <span style="font-size: 0.75rem;">(${totalRegDays}d x ${appSettings.wage})</span></span> <strong>${payBasic.toLocaleString()}</strong></div>`;
-                }
-            }
-            
-            if (payOt15 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 1.5 <span style="font-size: 0.75rem;">(${totalOt15}h x ${appSettings.ot15})</span></span> <strong>${payOt15.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></div>`;
-            }
-            if (payOt20 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 2.0 <span style="font-size: 0.75rem;">(${totalOt20}h x ${appSettings.ot20})</span></span> <strong>${payOt20.toLocaleString()}</strong></div>`;
-            }
-            if (payOt30 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 3.0 <span style="font-size: 0.75rem;">(${totalOt30}h x ${appSettings.ot30})</span></span> <strong>${payOt30.toLocaleString()}</strong></div>`;
-            }
-            if (payNight > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].nightAllow} <span style="font-size: 0.75rem;">(${totalNight} x ${appSettings.night})</span></span> <strong>${payNight.toLocaleString()}</strong></div>`;
-            }
-            if (payMeal > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].mealAllow} <span style="font-size: 0.75rem;">(${totalMeal} x ${appSettings.meal})</span></span> <strong>${payMeal.toLocaleString()}</strong></div>`;
-            }
-            
-            if (fallbackFixed > 0) {
-                const fixedTitle = lang === 'mm' ? 'အပြတ်လုပ်ခ / အပိုရငွေ' : 'Fixed / Extra Pay';
-                summaryHTML += `<div class="summary-row"><span>${fixedTitle} <span style="font-size: 0.75rem; color: var(--text-muted);">(${fallbackFixedCount}x)</span></span> <strong style="color: var(--success-green);">+ ${fallbackFixed.toLocaleString()}</strong></div>`;
-            }
-            if (fallbackAdvance > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].advancePayTitle} <span style="font-size: 0.75rem; color: var(--text-muted);">(${fallbackAdvanceCount}x)</span></span> <strong style="color: var(--danger-red);">- ${fallbackAdvance.toLocaleString()}</strong></div>`;
-            }
-            
-            for(const key in combinedExtras) {
-                let data = combinedExtras[key];
-                netTotal += data.total;
-                summaryHTML += `<div class="summary-row"><span>${data.name} <span style="font-size: 0.75rem; color: var(--text-muted);">(${data.count}x)</span></span> <strong style="color: var(--success-green);">+ ${data.total.toLocaleString()}</strong></div>`;
-            }
-            
-            for(const key in combinedExpenses) {
-                let data = combinedExpenses[key];
-                netTotal -= data.total;
-                summaryHTML += `<div class="summary-row"><span>${data.name} <span style="font-size: 0.75rem; color: var(--text-muted);">(${data.count}x)</span></span> <strong style="color: var(--danger-red);">- ${data.total.toLocaleString()}</strong></div>`;
-            }
-            
-            summaryHTML += customHTML;
-
-            if (ssoAmount > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].ssoName} <span style="font-size: 0.75rem;">(${ssoPercent}%)</span></span> <strong style="color: var(--danger-red);">- ${ssoAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></div>`;
-            }
-
-            summaryHTML += `<div class="summary-total"><span style="color: var(--text-main);">${i18n[lang].netTotal}</span> <span style="color: var(--primary-blue); font-size: 1.5rem;">${netTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</span></div>`;
-
-            document.getElementById('summary-content').innerHTML = summaryHTML;
-        }
-
-        function calculateManual() {
-            const reg = Number(document.getElementById('calc-reg').value) || 0;
-            const ot15 = Number(document.getElementById('calc-ot15').value) || 0;
-            const ot20 = Number(document.getElementById('calc-ot20').value) || 0;
-            const ot30 = Number(document.getElementById('calc-ot30').value) || 0;
-            const night = Number(document.getElementById('calc-night').value) || 0;
-            const meal = Number(document.getElementById('calc-meal').value) || 0;
-
-            let payBasic = 0;
-            if (appSettings.empType === 'monthly') {
-                payBasic = appSettings.wage;
-            } else {
-                payBasic = reg * appSettings.wage;
-            }
-
-            const payOt15 = ot15 * appSettings.ot15;
-            const payOt20 = ot20 * appSettings.ot20;
-            const payOt30 = ot30 * appSettings.ot30;
-            const payNight = night * appSettings.night;
-            const payMeal = meal * appSettings.meal;
-
-            let ssoAmount = 0;
-            const ssoPercent = appSettings.ssoPercent || 0;
-            const ssoMax = appSettings.ssoMax !== undefined ? appSettings.ssoMax : 750;
-            if (ssoPercent > 0 && payBasic > 0) {
-                ssoAmount = payBasic * (ssoPercent / 100);
-                if (ssoMax > 0 && ssoAmount > ssoMax) {
-                    ssoAmount = ssoMax;
-                }
-            }
-
-            let total = payBasic + payOt15 + payOt20 + payOt30 + payNight + payMeal - ssoAmount;
-            
-            let customHTML = '';
-            if(appSettings.customAllowances) {
-                appSettings.customAllowances.forEach(allow => { 
-                    total += allow.amount; 
-                    customHTML += `<div class="summary-row"><span>${allow.name} <span style="font-size: 0.7rem; color: var(--text-muted);">(Fixed)</span></span> <strong style="color: var(--success-green);">+ ${allow.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-            if(appSettings.customExpenses) {
-                appSettings.customExpenses.forEach(exp => { 
-                    total -= exp.amount; 
-                    customHTML += `<div class="summary-row"><span>${exp.name} <span style="font-size: 0.7rem; color: var(--text-muted);">(Fixed)</span></span> <strong style="color: var(--danger-red);">- ${exp.amount.toLocaleString()}</strong></div>`;
-                });
-            }
-
-            let extraHTML = '';
-            document.querySelectorAll('#calc-extra-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value || (appSettings.language === 'mm' ? 'အခြားရငွေ' : 'Extra');
-                const amt = Math.abs(Number(row.children[1].value));
-                if(amt > 0) {
-                    total += amt;
-                    extraHTML += `<div class="summary-row"><span>${name}</span> <strong style="color: var(--success-green);">+ ${amt.toLocaleString()}</strong></div>`;
-                }
-            });
-
-            document.querySelectorAll('#calc-expense-container .custom-allow-row').forEach(row => {
-                const name = row.children[0].value || (appSettings.language === 'mm' ? 'ဖြတ်ငွေ' : 'Expense');
-                const amt = Math.abs(Number(row.children[1].value));
-                if(amt > 0) {
-                    total -= amt;
-                    extraHTML += `<div class="summary-row"><span>${name}</span> <strong style="color: var(--danger-red);">- ${amt.toLocaleString()}</strong></div>`;
-                }
-            });
-
-            document.getElementById('calc-result').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
-
-            const lang = appSettings.language || 'en';
-            let summaryHTML = '';
-
-            if (appSettings.empType === 'monthly') {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].monthlySalary}</span> <strong>${payBasic.toLocaleString()}</strong></div>`;
-            } else {
-                if (payBasic > 0 || reg > 0) {
-                    summaryHTML += `<div class="summary-row"><span>${i18n[lang].basicPay} <span style="font-size: 0.75rem;">(${reg}d x ${appSettings.wage})</span></span> <strong>${payBasic.toLocaleString()}</strong></div>`;
-                }
-            }
-
-            if (payOt15 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 1.5 <span style="font-size: 0.75rem;">(${ot15}h x ${appSettings.ot15})</span></span> <strong>${payOt15.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></div>`;
-            }
-            if (payOt20 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 2.0 <span style="font-size: 0.75rem;">(${ot20}h x ${appSettings.ot20})</span></span> <strong>${payOt20.toLocaleString()}</strong></div>`;
-            }
-            if (payOt30 > 0) {
-                summaryHTML += `<div class="summary-row"><span>OT 3.0 <span style="font-size: 0.75rem;">(${ot30}h x ${appSettings.ot30})</span></span> <strong>${payOt30.toLocaleString()}</strong></div>`;
-            }
-            if (payNight > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].nightAllow} <span style="font-size: 0.75rem;">(${night} x ${appSettings.night})</span></span> <strong>${payNight.toLocaleString()}</strong></div>`;
-            }
-            if (payMeal > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].mealAllow} <span style="font-size: 0.75rem;">(${meal} x ${appSettings.meal})</span></span> <strong>${payMeal.toLocaleString()}</strong></div>`;
-            }
-
-            summaryHTML += customHTML;
-            summaryHTML += extraHTML;
-
-            if (ssoAmount > 0) {
-                summaryHTML += `<div class="summary-row"><span>${i18n[lang].ssoName} <span style="font-size: 0.75rem;">(${ssoPercent}%)</span></span> <strong style="color: var(--danger-red);">- ${ssoAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></div>`;
-            }
-
-            summaryHTML += `<div class="summary-total"><span style="color: var(--text-main);">${i18n[lang].netTotal}</span> <span style="color: var(--primary-blue); font-size: 1.5rem;">${total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span></div>`;
-
-            document.getElementById('calc-summary-content').innerHTML = summaryHTML;
-            document.getElementById('calc-summary-container').style.display = 'block';
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-    </script>
 </body>
 </html>
